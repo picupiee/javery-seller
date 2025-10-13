@@ -25,7 +25,10 @@ const signIn = () => {
             className="p-2 text-md placeholder:text-gray-500 border-2 border-gray-300 focus:border-black focus:outline-none transition-colors ease-in-out rounded-md"
           />
         </View>
-        <Pressable className="my-4 p-2 bg-orange-400 rounded-md items-center w-full">
+        <Pressable
+          className="my-4 p-2 bg-orange-400 rounded-md items-center w-full"
+          onPress={() => router.push("/dashboard/")}
+        >
           <Text className="text-white font-semibold">Masuk</Text>
         </Pressable>
       </View>
