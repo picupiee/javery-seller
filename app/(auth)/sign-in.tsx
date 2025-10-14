@@ -2,7 +2,14 @@ import { auth } from "@/lib/firebase";
 import { router } from "expo-router";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import React, { useState } from "react";
-import { Alert, Pressable, Text, TextInput, View } from "react-native";
+import {
+  ActivityIndicator,
+  Alert,
+  Pressable,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 
 const signIn = () => {
   const [email, setEmail] = useState("");
@@ -25,12 +32,12 @@ const signIn = () => {
   };
 
   return (
-    <View className="flex items-center mt-20">
+    <View className="flex-1 items-center justify-center">
       <Text className="text-lg font-semibold border-2 p-1 rounded-md">
         Selamat datang di Javery Seller
       </Text>
-      <View className="mt-8 flex-col items-center">
-        <View className="flex-col gap-2">
+      <View className="flex-col items-center justify-center w-full mt-8">
+        <View className="gap-2 w-1/2">
           <TextInput
             placeholder="Alamat Email"
             value={email}
@@ -48,10 +55,24 @@ const signIn = () => {
           />
         </View>
         <Pressable
-          className="my-4 p-2 bg-orange-400 rounded-md items-center w-full"
+          className={`my-4 p-2 rounded-md items-center w-1/2 ${
+            loading ? "bg-orange-300" : "bg-orange-400"
+          }`}
           onPress={handleSignIn}
+          disabled={loading}
         >
-          <Text className="text-white font-semibold">Masuk</Text>
+          <Text className="text-white font-semibold">
+            {loading ? (
+              <View className="flex-row items-center">
+                <ActivityIndicator className="mr-2" size="small" color="#fff" />
+                <Text className="text-white font-semibold">
+                  Mohon Menunggu...
+                </Text>
+              </View>
+            ) : (
+              "Masuk"
+            )}
+          </Text>
         </Pressable>
       </View>
       <View className="flex-row gap-2 items-center justify-center mt-4">

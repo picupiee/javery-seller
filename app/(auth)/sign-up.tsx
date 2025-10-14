@@ -3,6 +3,7 @@ import { router } from "expo-router";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import React, { useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
   Platform,
   Pressable,
@@ -37,18 +38,18 @@ const signUp = () => {
   };
 
   return (
-    <View className="flex items-center mt-20">
+    <View className="flex-1 items-center justify-center">
       <Text className="text-lg font-semibold border-2 p-1 rounded-md">
         Selamat datang di Javery Seller
       </Text>
-      <View className="mt-8 flex-col items-center">
-        <View className="flex-col gap-2">
+      <View className="flex-col items-center justify-center w-full mt-8">
+        <View className="gap-2 w-1/2">
           <TextInput
             placeholder="Alamat Email"
             // value={email}
             onChangeText={setEmail}
             keyboardType="email-address"
-            className="p-2 placeholder:text-gray-500 text-md border-2 border-gray-300 focus:border-black focus:outline-none transition-colors ease-in-out rounded-m"
+            className="p-2 placeholder:text-gray-500 text-md border-2 border-gray-300 focus:border-black focus:outline-none transition-colors ease-in-out rounded-md"
           />
           <TextInput
             placeholder="Kata Sandi"
@@ -66,14 +67,23 @@ const signUp = () => {
           /> */}
         </View>
         <Pressable
-          className={`my-4 p-2 rounded-md items-center w-full ${
+          className={`my-4 p-2 rounded-md items-center w-1/2 ${
             loading ? "bg-orange-300" : "bg-orange-400"
           }`}
           onPress={handleSignUp}
           disabled={loading}
         >
           <Text className="text-white font-semibold">
-            {loading ? "Mendaftarkan..." : "Daftar"}
+            {loading ? (
+              <View className="flex-row items-center">
+                <ActivityIndicator className="mr-2" size="small" color="#fff" />
+                <Text className="text-white font-semibold">
+                  Mendaftarkan...
+                </Text>
+              </View>
+            ) : (
+              "Daftar"
+            )}
           </Text>
         </Pressable>
       </View>
