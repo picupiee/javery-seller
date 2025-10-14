@@ -79,7 +79,7 @@ const signIn = () => {
         <Text>Belum mempunyai akun ?</Text>
         <Text
           className="text-blue-500 font-semibold"
-          onPress={() => router.push("/sign-up")}
+          onPress={() => router.replace("/sign-up")}
         >
           Daftar Sekarang
         </Text>

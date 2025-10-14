@@ -91,7 +91,7 @@ const signUp = () => {
         <Text>Sudah memiliki akun ?</Text>
         <Text
           className="text-blue-500 font-semibold"
-          onPress={() => router.push("/sign-in")}
+          onPress={() => router.replace("/sign-in")}
         >
           Masuk Sekarang
         </Text>
