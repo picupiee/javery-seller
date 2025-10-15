@@ -1,8 +1,10 @@
 import "@/global.css";
-import { Redirect, Slot, useSegments } from "expo-router";
-import { ActivityIndicator, Text, View } from "react-native";
-import { AuthProvider, useAuth } from "./context/AuthContext";
+import { router, Slot, SplashScreen, useSegments } from "expo-router";
 import { useEffect } from "react";
+import { ActivityIndicator, Text, View } from "react-native";
+import { AuthProvider, useAuth } from "../context/AuthContext";
+
+SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   return (
@@ -16,23 +18,31 @@ function AppLayout() {
   const { user, isLoading } = useAuth();
   const segments = useSegments();
 
+  useEffect(() => {
+    if (!isLoading) {
+      SplashScreen.hideAsync();
+    }
+  }, [isLoading]);
+
   if (isLoading) {
     return (
-      <View className="flex-row gap-2">
-        <ActivityIndicator size="large" color="black" />
-        <Text>Mohon Menunggu...</Text>
+      <View className="flex-1 items-center justify-center">
+        <View className="flex-row gap-2">
+          <ActivityIndicator size="large" color="#f97316" />
+          <Text className="text-lg">Mohon Menunggu...</Text>
+        </View>
       </View>
     );
   }
-  const inAuthGroup = segments[0] === '(auth)'
+  const inAuthGroup = segments[0] === "(auth)";
 
   useEffect(() => {
     if (user && inAuthGroup) {
-      <Redirect href="/dashboard/home" />
+      router.replace("/dashboard/home");
     } else if (!user && !inAuthGroup) {
-      <Redirect href="/" />
+      router.replace("/sign-in");
     }
-  }, [user, inAuthGroup])
+  }, [user, inAuthGroup]);
 
-  return <Slot />
+  return <Slot />;
 }
