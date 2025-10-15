@@ -10,7 +10,7 @@ import {
 interface ButtonsProps extends PressableProps {
   title: string;
   onLoading?: string;
-  isLoading: boolean;
+  isLoading?: boolean;
   textStyle?: string;
   className?: string;
 }

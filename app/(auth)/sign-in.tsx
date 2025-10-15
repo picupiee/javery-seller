@@ -1,5 +1,4 @@
 import Buttons from "@/components/ui/Buttons";
-import { useAuth } from "@/context/AuthContext";
 import { auth } from "@/lib/firebase";
 import { router } from "expo-router";
 import { signInWithEmailAndPassword } from "firebase/auth";
@@ -18,8 +17,6 @@ const signIn = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const { user } = useAuth();
-  const storeName = user?.profile?.storeName;
 
   const handleSignIn = async () => {
     if (loading) return;
@@ -41,10 +38,7 @@ const signIn = () => {
       if (Platform.OS === "web") {
         window.alert(successMessage);
       } else {
-        Alert.alert(
-          `Selamat Datang ${storeName}`,
-          "Tekan OK untuk melanjutkan."
-        );
+        Alert.alert(`Selamat Datang`, "Tekan OK untuk melanjutkan.");
       }
       router.push("/dashboard/home");
     } catch (error: any) {
