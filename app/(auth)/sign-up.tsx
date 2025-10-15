@@ -117,6 +117,11 @@ const signUp = () => {
             className="p-2 placeholder:text-gray-500 text-md border-2 border-gray-300 focus:border-black focus:outline-none transition-colors ease-in-out rounded-md"
           />
         </View>
+        {error ? (
+          <Text className="text-red-500 text-center font-semibold mt-1 w-full max-w-sm">
+            {error}
+          </Text>
+        ) : null}
         <Buttons
           title="Daftar"
           onLoading="Mohon Menunggu..."
@@ -125,11 +130,6 @@ const signUp = () => {
           onPress={handleSignUp}
         />
       </View>
-      {error ? (
-        <Text className="text-red-500 text-center font-semibold mt-2 w-full max-w-sm">
-          {error}
-        </Text>
-      ) : null}
       <View className="flex-row gap-2 items-center justify-center mt-4">
         <Text>Sudah memiliki akun ?</Text>
         <Text

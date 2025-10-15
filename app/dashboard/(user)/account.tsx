@@ -23,8 +23,10 @@ const account = () => {
   };
 
   return (
-    <View className="flex-1 items-center justify-center">
-      <Text className="text-lg font-semibold">Akun dan Setelan</Text>
+    <View className="flex p-4">
+      <View>
+        <Text className="text-lg font-semibold">Akun dan Setelan</Text>
+      </View>
       <Pressable className="p-2 bg-red-500 rounded-md" onPress={handleLogout}>
         <Text className="text-center text-white">Keluar</Text>
       </Pressable>
