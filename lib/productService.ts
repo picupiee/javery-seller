@@ -3,6 +3,8 @@ import {
   collection,
   DocumentData,
   getDocs,
+  onSnapshot,
+  orderBy,
   query,
   QuerySnapshot,
   serverTimestamp,
@@ -22,10 +24,43 @@ export interface Product {
 }
 
 /**
- * Fetches all products belonging to a specific seller (ownerUid)
+ * Sets up a real-time listener for products belonging to a specific seller.
  * @param ownerUid The UID of the currently logged-in seller.
- * @returns A promise that resolve to an array of Product objects.
+ * @param callback A function to execute every time the product list changes.
+ * @returns An unsubscribe function to stop the listener when the component unmounts.
  */
+
+export const subscribeToSellerProducts = (
+  ownerUid: string,
+  callback: (products: Product[]) => void
+) => {
+  const productRef = collection(db, "products");
+
+  const q = query(
+    productRef,
+    where("ownerUid", "==", ownerUid),
+    orderBy("createdAt", "desc")
+  );
+
+  const unsubscribe = onSnapshot(
+    q,
+    (querySnapshot: QuerySnapshot<DocumentData>) => {
+      const products: Product[] = [];
+
+      querySnapshot.forEach((doc) => {
+        products.push({
+          id: doc.id,
+          ...doc.data(),
+        } as Product);
+      });
+      callback(products);
+    },
+    (error) => {
+      console.error("Error subscribing to seller products :", error);
+    }
+  );
+  return unsubscribe;
+};
 
 export const createProduct = async (
   productData: Omit<Product, "id" | "createdAt">

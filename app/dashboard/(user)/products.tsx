@@ -1,42 +1,64 @@
 import Buttons from "@/components/ui/Buttons";
 import { useAuth } from "@/context/AuthContext";
-import { getSellerProducts, Product } from "@/lib/productService";
+import { Product, subscribeToSellerProducts } from "@/lib/productService";
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { ActivityIndicator, Alert, FlatList, Text, View } from "react-native";
+import { ActivityIndicator, FlatList, Text, View } from "react-native";
 
 const products = () => {
   const { user } = useAuth();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
-  const fetchProducts = async () => {
+  const handleRetry = () => {
+    setRefreshTrigger((prev) => prev + 1);
+  };
+
+  useEffect(() => {
     if (!user) {
-      setError("User not authenticated.");
       setLoading(false);
-      router.replace("/sign-in");
       return;
     }
 
     setLoading(true);
     setError(null);
-    try {
-      // Augmented UID to fetch products
-      const data = await getSellerProducts(user.uid);
-      setProducts(data);
-    } catch (err: any) {
-      console.error(err);
-      setError(err.message || "Terjadi kesalahan saat memuat produk");
-      Alert.alert("Error", err.message || "Gagal saat memuat produk");
-    } finally {
-      setLoading(false);
-    }
-  };
 
-  useEffect(() => {
-    fetchProducts();
-  }, [user]);
+    const unsubscribe = subscribeToSellerProducts(user.uid, (newProducts) => {
+      setProducts(newProducts);
+      setLoading(false);
+    });
+    return () => unsubscribe();
+  }, [user, refreshTrigger]);
+
+  // Old Logic
+  // const fetchProducts = async () => {
+  //   if (!user) {
+  //     setError("User not authenticated.");
+  //     setLoading(false);
+  //     router.replace("/sign-in");
+  //     return;
+  //   }
+
+  //   setLoading(true);
+  //   setError(null);
+  //   try {
+  //     // Augmented UID to fetch products
+  //     const data = await getSellerProducts(user.uid);
+  //     setProducts(data);
+  //   } catch (err: any) {
+  //     console.error(err);
+  //     setError(err.message || "Terjadi kesalahan saat memuat produk");
+  //     Alert.alert("Error", err.message || "Gagal saat memuat produk");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   fetchProducts();
+  // }, [user]);
 
   // Render logic
   if (loading) {
@@ -52,7 +74,7 @@ const products = () => {
     return (
       <View className="flex-1 items-center justify-center p-4">
         <Text className="text-red-600 font-semibold mb-4">{error}</Text>
-        <Text className="text-blue-500 underline" onPress={fetchProducts}>
+        <Text className="text-blue-500 underline" onPress={handleRetry}>
           Coba muat ulang
         </Text>
       </View>

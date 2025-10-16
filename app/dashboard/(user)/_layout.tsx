@@ -8,7 +8,7 @@ export default function RootLayout() {
         headerShown: false,
         tabBarActiveTintColor: "#f97316",
         tabBarInactiveTintColor: "#4b5563",
-        animation: "shift",
+        animation: "fade",
       }}
     >
       <Tabs.Screen
