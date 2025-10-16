@@ -95,23 +95,26 @@ const signUp = () => {
         Selamat datang di Javery Seller
       </Text>
       <View className="flex-col items-center justify-center w-full mt-8 md:w-96">
-        <View className="gap-2 w-1/2">
+        <View className="w-1/2">
+          <Text className="text-md mt-2">Alamat Email</Text>
           <TextInput
-            placeholder="Alamat Email"
+            placeholder="contoh@gmail.com"
             // value={email}
             onChangeText={setEmail}
             keyboardType="email-address"
             className="p-2 placeholder:text-gray-500 text-md border-2 border-gray-300 focus:border-black focus:outline-none transition-colors ease-in-out rounded-md"
           />
+          <Text className="text-md mt-2">Password</Text>
           <TextInput
-            placeholder="Kata Sandi"
+            placeholder="Masukkan kata sandi"
             secureTextEntry
             value={password}
             onChangeText={setPassword}
             className="p-2 text-md placeholder:text-gray-500 border-2 border-gray-300 focus:border-black focus:outline-none transition-colors ease-in-out rounded-md"
           />
+          <Text className="text-md mt-2">Nama Toko</Text>
           <TextInput
-            placeholder="Nama Toko (Contoh: 'Kedai Puri')"
+            placeholder="Contoh: 'Kedai Puri'"
             value={storeName}
             onChangeText={setStoreName}
             className="p-2 placeholder:text-gray-500 text-md border-2 border-gray-300 focus:border-black focus:outline-none transition-colors ease-in-out rounded-md"

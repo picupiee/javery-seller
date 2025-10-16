@@ -1,9 +1,11 @@
 import {
+  addDoc,
   collection,
   DocumentData,
   getDocs,
   query,
   QuerySnapshot,
+  serverTimestamp,
   where,
 } from "firebase/firestore";
 import { db } from "./firebase";
@@ -25,7 +27,23 @@ export interface Product {
  * @returns A promise that resolve to an array of Product objects.
  */
 
-export const getSellerProducs = async (
+export const createProduct = async (
+  productData: Omit<Product, "id" | "createdAt">
+): Promise<string> => {
+  try {
+    const productsRef = collection(db, "products");
+    const docRef = await addDoc(productsRef, {
+      ...productData,
+      createdAt: serverTimestamp(),
+    });
+    return docRef.id;
+  } catch (error) {
+    console.error("Error creating product: ", error);
+    throw new Error("Gagal menyimpan produk baru. Silahkan coba lagi.");
+  }
+};
+
+export const getSellerProducts = async (
   ownerUid: string
 ): Promise<Product[]> => {
   try {

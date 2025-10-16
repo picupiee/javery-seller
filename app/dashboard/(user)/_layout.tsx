@@ -47,6 +47,12 @@ export default function RootLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="add-product"
+        options={{
+          href: null,
+        }}
+      />
     </Tabs>
   );
 }
