@@ -51,8 +51,7 @@ const AddProductScreen = () => {
       await createProduct(newProduct);
 
       Alert.alert("Berhasil", "Produk sukses ditambahkan.");
-
-      router.back();
+      router.replace("/dashboard/products");
     } catch (err: any) {
       console.error("Add product error: ", err);
       setError(err.message || "Gagal menyimpan produk. Silahkan coba kembali.");
@@ -126,4 +125,4 @@ const AddProductScreen = () => {
   );
 };
 
-export default AddProductScreen
+export default AddProductScreen;

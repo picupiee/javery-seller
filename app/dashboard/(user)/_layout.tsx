@@ -8,7 +8,7 @@ export default function RootLayout() {
         headerShown: false,
         tabBarActiveTintColor: "#f97316",
         tabBarInactiveTintColor: "#4b5563",
-        animation: "fade",
+        animation: "shift",
       }}
     >
       <Tabs.Screen
@@ -49,6 +49,18 @@ export default function RootLayout() {
       />
       <Tabs.Screen
         name="add-product"
+        options={{
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name="edit-product/[id]"
+        options={{
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name="order-detail/[id]"
         options={{
           href: null,
         }}

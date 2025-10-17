@@ -1,9 +1,13 @@
 import Buttons from "@/components/ui/Buttons";
 import { useAuth } from "@/context/AuthContext";
-import { Product, subscribeToSellerProducts } from "@/lib/productService";
+import {
+  deleteProduct,
+  Product,
+  subscribeToSellerProducts,
+} from "@/lib/productService";
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { ActivityIndicator, FlatList, Text, View } from "react-native";
+import { ActivityIndicator, Alert, FlatList, Text, View } from "react-native";
 
 const products = () => {
   const { user } = useAuth();
@@ -14,6 +18,39 @@ const products = () => {
 
   const handleRetry = () => {
     setRefreshTrigger((prev) => prev + 1);
+  };
+
+  // Delete function
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const handleDelete = (product: Product) => {
+    Alert.alert(
+      "Hapus Produk",
+      `Yakin ingin menghapus produk "${product.name}"?`,
+      [
+        { text: "Batal", style: "cancel" },
+        {
+          text: "Hapus",
+          onPress: () => executeDelete(product.id),
+          style: "destructive",
+        },
+      ]
+    );
+  };
+
+  const executeDelete = async (productId: string) => {
+    setDeletingId(productId);
+    try {
+      await deleteProduct(productId);
+      Alert.alert("Sukses", "Produk telah dihapus dari tokomu.");
+    } catch (e: any) {
+      console.error(e);
+      Alert.alert(
+        "Gagal Menghapus",
+        e.message || "Gagal menghapus produk. Coba lagi."
+      );
+    } finally {
+      setDeletingId(null);
+    }
   };
 
   useEffect(() => {
@@ -31,34 +68,6 @@ const products = () => {
     });
     return () => unsubscribe();
   }, [user, refreshTrigger]);
-
-  // Old Logic
-  // const fetchProducts = async () => {
-  //   if (!user) {
-  //     setError("User not authenticated.");
-  //     setLoading(false);
-  //     router.replace("/sign-in");
-  //     return;
-  //   }
-
-  //   setLoading(true);
-  //   setError(null);
-  //   try {
-  //     // Augmented UID to fetch products
-  //     const data = await getSellerProducts(user.uid);
-  //     setProducts(data);
-  //   } catch (err: any) {
-  //     console.error(err);
-  //     setError(err.message || "Terjadi kesalahan saat memuat produk");
-  //     Alert.alert("Error", err.message || "Gagal saat memuat produk");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   fetchProducts();
-  // }, [user]);
 
   // Render logic
   if (loading) {
@@ -99,13 +108,38 @@ const products = () => {
   }
 
   // Helper for single product
-  const renderProductItem = ({ item }: { item: Product }) => (
-    <View className="p-4 m-2 bg-white rounded-lg shadow-sm border border-gray-100">
-      <Text className="text-lg font-semibold">{item.name}</Text>
-      <Text className="text-sm text-gray-700">Harga: Rp.{item.price}</Text>
-      <Text className="text-sm text-gray-700">Stok: {item.stock}</Text>
-    </View>
-  );
+  const renderProductItem = ({ item }: { item: Product }) => {
+    const isDeleting = deletingId === item.id;
+    return (
+      <View className="p-4 m-2 bg-white rounded-lg shadow-sm border border-gray-100 flex-row justify-between items-center">
+        <View className="flex-1 pr-4">
+          <Text className="text-lg font-semibold">{item.name}</Text>
+          <Text className="text-sm text-gray-700">Harga: Rp. {item.price}</Text>
+          <Text className="text-sm text-gray-700">Stok: {item.stock}</Text>
+        </View>
+        <View className="flex-row gap-2">
+          {/* Edit Button */}
+          <Buttons
+            title="Edit"
+            isLoading={false}
+            className="p-2 bg-blue-500 rounded-md"
+            textStyle="text-white text-xs font-semibold"
+            onPress={() =>
+              router.push(`/dashboard/(user)/edit-product/${item.id}`)
+            }
+          />
+          {/* Delete Button */}
+          <Buttons
+            title={isDeleting ? "..." : "Hapus"}
+            isLoading={isDeleting}
+            className={`p-2 rounded-md ${isDeleting ? "bg-gray-400" : "bg-red-600"}`}
+            textStyle="text-white text-xs font-semibold"
+            onPress={() => handleDelete(item)}
+          />
+        </View>
+      </View>
+    );
+  };
 
   return (
     <View className="flex-1">
