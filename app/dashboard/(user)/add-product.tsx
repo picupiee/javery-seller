@@ -65,7 +65,7 @@ const AddProductScreen = () => {
   return (
     <ScrollView
       contentContainerStyle={{ flexGrow: 1 }}
-      className="p-6 bg-white"
+      className="p-6 bg-white mt-4"
     >
       <Text className="text-2xl font-bold mb-8 text-gray-800">
         Tambah Produk
@@ -122,6 +122,12 @@ const AddProductScreen = () => {
         className="p-3 bg-orange-500 rounded-lg shadow-md"
         textStyle="text-white text-center font-bold text-lg"
         onPress={handleAddProduct}
+      />
+      <Buttons
+        title="Batal"
+        className="p-3 bg-red-500 rounded-lg shadow-md mt-2"
+        textStyle="text-white text-center font-bold text-lg"
+        onPress={() => router.replace("/dashboard/products")}
       />
     </ScrollView>
   );

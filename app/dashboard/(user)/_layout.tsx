@@ -9,6 +9,10 @@ export default function RootLayout() {
         tabBarActiveTintColor: "#f97316",
         tabBarInactiveTintColor: "#4b5563",
         animation: "shift",
+        sceneStyle: {
+          backgroundColor: "white",
+          marginTop: 30,
+        },
       }}
     >
       <Tabs.Screen

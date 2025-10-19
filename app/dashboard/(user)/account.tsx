@@ -41,7 +41,7 @@ const account = () => {
   };
 
   return (
-    <View className="flex-1 p-6 mt-4">
+    <View className="flex-1 p-6">
       <View className="bg-slate-300 p-4 rounded-lg shadow-md mb-8">
         <Text className="text-xl font-bold mb-4 text-gray-800">
           Informasi Akun

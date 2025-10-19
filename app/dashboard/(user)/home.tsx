@@ -1,4 +1,3 @@
-import Buttons from "@/components/ui/Buttons";
 import { useAuth } from "@/context/AuthContext";
 import { calculateTotalRevenue, countOrderByStatus } from "@/lib/orderService";
 import { countTotalProducts } from "@/lib/productService";
@@ -7,6 +6,7 @@ import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  Pressable,
   RefreshControl,
   ScrollView,
   Text,
@@ -30,6 +30,29 @@ const home = () => {
   });
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const storeName = user?.profile?.storeName || "Toko Anda";
+
+  const [greeting, setGreeting] = useState("");
+
+  useEffect(() => {
+    const updateGreeting = () => {
+      const now = new Date();
+      const hours = now.getHours();
+
+      if (hours < 12) {
+        setGreeting(`Selamat Pagi, ${storeName}`);
+      } else if (hours >= 12 && hours < 14) {
+        setGreeting(`Selamat Siang, ${storeName}`);
+      } else if (hours >= 14 && hours < 18) {
+        setGreeting(`Selamat Sore, ${storeName}`);
+      } else {
+        setGreeting(`Selamat Malam, ${storeName}`);
+      }
+    };
+    updateGreeting();
+    const intervalId = setInterval(updateGreeting, 60000);
+    return () => clearInterval(intervalId);
+  }, [storeName]);
 
   const fetchData = async (showLoading = true) => {
     if (!user) return;
@@ -81,12 +104,12 @@ const home = () => {
     colorClass: string,
     navPath?: string
   ) => (
-    <Buttons
-      title={title}
+    <Pressable
       onPress={() => navPath && router.push(navPath as any)}
       className={`w-full p-4 mb-4 rounded-lg shadow-md ${colorClass}`}
       disabled={!navPath}
     >
+      <Text className="text-white text-sm opacity-80">{title}</Text>
       <Text className="text-white text-3xl font-bold mt-1">
         {value === null
           ? "--"
@@ -99,7 +122,7 @@ const home = () => {
           Lihat Detail
         </Text>
       )}
-    </Buttons>
+    </Pressable>
   );
 
   return (
@@ -109,12 +132,12 @@ const home = () => {
         <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
       }
     >
-      <Text className="text-3xl font-bold mb-6 text-gray-800 mt-10">
-        Dashboard Toko
-      </Text>
+      <Text className="text-3xl font-bold mb-6 text-gray-800">{greeting}</Text>
       {/* Sales / Orders Metrics */}
       <View className="mb-6">
-        <Text className="text-lg font-semibold mb-3">Kinerja Penjualan</Text>
+        <Text className="text-md font-semibold mb-3 border-b-2 pb-1">
+          Kinerja Penjualan
+        </Text>
         {renderMetricCard(
           "Total Pendapatan (Terkirim)",
           metrics.totalRevenue,
@@ -135,7 +158,7 @@ const home = () => {
       </View>
       {/* Inventory Metrics */}
       <View>
-        <Text>Kelola Produk</Text>
+        <Text className="text-md mb-2">Kelola Produk</Text>
         {renderMetricCard(
           "Total Produk",
           metrics.totalProducts,
