@@ -2,6 +2,7 @@ import {
   collection,
   doc,
   getDoc,
+  getDocs,
   onSnapshot,
   orderBy,
   query,
@@ -86,15 +87,6 @@ export const updateOrderStatus = async (
  */
 export const getOrderById = async (orderId: string): Promise<Order | null> => {
   try {
-    // const orderRef = doc(db, "orders", orderId);
-    // const docSnap = await getDoc(orderRef);
-
-    // if(docSnap.exists()) {
-    //     return {
-    //         id: docSnap.id,
-    //         ...docSnap.data(),
-    //     } as Order
-    // }
     const orderRef = doc(db, "orders", orderId);
     const docSnap = await getDoc(orderRef);
 
@@ -108,5 +100,66 @@ export const getOrderById = async (orderId: string): Promise<Order | null> => {
   } catch (error) {
     console.error("Error fetching order by ID: ", error);
     throw new Error("Gagal mengambil detail pesanan");
+  }
+};
+
+/**
+ * Fetches the count of orders matching a specific status for a seller.
+ * @param sellerUid The UID of the seller.
+ * @param status The status to count ('pending', 'processing', etc.).
+ * @returns A promise that resolves to the number of orders found.
+ */
+
+export const countOrderByStatus = async (
+  sellerUid: string,
+  status: string
+): Promise<number> => {
+  try {
+    const ordersRef = collection(db, "orders");
+
+    const q = query(
+      ordersRef,
+      where("sellerUid", "==", sellerUid),
+      where("status", "==", status)
+    );
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.size;
+  } catch (err) {
+    console.error(`Error counting orders with status ${status}:`, { err });
+    throw new Error("Gagal menghitung pesanan.");
+  }
+};
+
+/**
+ * Calculates the total revenue from delivered orders for a seller.
+ * NOTE: This requires fetching all 'delivered' documents and manually summing.
+ * For production scale, consider using Firebase Cloud Functions for aggregation.
+ * @param sellerUid The UID of the seller.
+ * @returns A promise that resolves to the total revenue.
+ */
+
+export const calculateTotalRevenue = async (
+  sellerUid: string
+): Promise<number> => {
+  try {
+    const ordersRef = collection(db, "orders");
+    const q = query(
+      ordersRef,
+      where("sellerUid", "==", sellerUid),
+      where("status", "==", "delivered")
+    );
+    const querySnapshot = await getDocs(q);
+    let total = 0;
+
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      if (typeof data.totalAmount === "number") {
+        total += data.totalAmount;
+      }
+    });
+    return total;
+  } catch (error) {
+    console.error("Error calculating total revenue: ", error);
+    throw new Error("Gagal menghitung total pendapatan.");
   }
 };

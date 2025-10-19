@@ -49,8 +49,10 @@ const AddProductScreen = () => {
       };
 
       await createProduct(newProduct);
-
       Alert.alert("Berhasil", "Produk sukses ditambahkan.");
+      setName("");
+      setPrice("");
+      setStock("");
       router.replace("/dashboard/products");
     } catch (err: any) {
       console.error("Add product error: ", err);

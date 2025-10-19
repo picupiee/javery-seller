@@ -2,7 +2,7 @@
   "expo": {
     "name": "javery-seller",
     "slug": "javery-seller",
-    "version": "1.0.3",
+    "version": "1.1.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "javeryseller",
@@ -57,6 +57,12 @@
       "EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID": "${EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID}",
       "EXPO_PUBLIC_FIREBASE_APP_ID": "${EXPO_PUBLIC_FIREBASE_APP_ID}",
       "EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID": "${EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID}"
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/06f6c52e-caee-4395-8371-84c88e3cd17e"
     }
   }
 }

@@ -4,6 +4,7 @@ import {
   deleteDoc,
   doc,
   DocumentData,
+  getDoc,
   getDocs,
   onSnapshot,
   orderBy,
@@ -12,7 +13,6 @@ import {
   serverTimestamp,
   updateDoc,
   where,
-  getDoc
 } from "firebase/firestore";
 import { db } from "./firebase";
 
@@ -112,9 +112,11 @@ export const createProduct = async (
  * @returns A promise that resolves to the Product object or null if not found.
  */
 
-export const getProductById = async (productId: string): Promise<Product | null> => {
+export const getProductById = async (
+  productId: string
+): Promise<Product | null> => {
   try {
-    const productRef = doc(db, "products", productId)
+    const productRef = doc(db, "products", productId);
     const docSnap = await getDoc(productRef);
 
     if (docSnap.exists()) {
@@ -125,10 +127,10 @@ export const getProductById = async (productId: string): Promise<Product | null>
     }
     return null;
   } catch (error) {
-    console.error("Error fetching product by ID :", error)
-    throw new Error("Gagal mengambil detail produk.")
+    console.error("Error fetching product by ID :", error);
+    throw new Error("Gagal mengambil detail produk.");
   }
-}
+};
 
 /**
  * Updates an existing product document in Firestore.
@@ -170,4 +172,11 @@ export const getSellerProducts = async (
     console.error("Error fetching seller products: ", error);
     throw new Error("Gagal mengambil daftar produk. Silahkan coba kembali.  ");
   }
+};
+
+export const countTotalProducts = async (ownerUid: string): Promise<number> => {
+  const productsRef = collection(db, "products");
+  const q = query(productsRef, where("ownerUid", "==", ownerUid));
+  const querySnapshot = await getDocs(q);
+  return querySnapshot.size;
 };
