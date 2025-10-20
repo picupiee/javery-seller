@@ -166,6 +166,12 @@ const home = () => {
           "/dashboard/(user)/products"
         )}
       </View>
+      <View className="mt-3 border-t-4 border-gray-300 pt-2">
+        <Text className="text-3xl font-semibold">Berita Javery</Text>
+        <Text className="mt-10 text-xl font-semibold text-gray-400 text-center">
+          Segera Hadir
+        </Text>
+      </View>
       <View className="h-20" />
     </ScrollView>
   );

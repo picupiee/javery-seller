@@ -4,6 +4,8 @@ import {
   OrderStatus,
   subscribeToSellerOrders,
 } from "@/lib/orderService";
+import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -12,7 +14,6 @@ import {
   Text,
   View,
 } from "react-native";
-import { router } from "expo-router";
 
 const getStatusColor = (status: OrderStatus) => {
   switch (status) {
@@ -81,12 +82,22 @@ const orderList = () => {
   if (orders.length === 0) {
     return (
       <View className="flex-1 items-center justify-center p-6 bg-white">
+        <Ionicons name="sad-sharp" size={64} color="#9ca3af" />
         <Text className="text-xl font-bold text-center text-gray-800 mb-2">
           Belum ada pesanan
         </Text>
         <Text className="text-lg text-center text-gray-600">
           Pesanan baru akan muncul disini.
         </Text>
+        <Pressable
+          onPress={handleRetry}
+          className="flex-row items-center mt-10 gap-2"
+        >
+          <Text className="text-blue-500 text-lg">
+            Muat Ulang Daftar Pesanan
+          </Text>
+          <Ionicons name="refresh-circle" size={24} color="blue" />
+        </Pressable>
       </View>
     );
   }
