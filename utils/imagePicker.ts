@@ -17,30 +17,78 @@ export const selectAndManipulateImage = async (): Promise<{
   uri: string;
   filename: string;
 } | null> => {
-  let permissionResult =
-    await ImagePicker.requestMediaLibraryPermissionsAsync();
-  await ImagePicker.requestCameraPermissionsAsync();
-  if (!permissionResult.granted) {
-    Alert.alert("Izin akses galeri diperlukan!");
-    return null;
-  }
-
-  let pickerResult = await ImagePicker.launchImageLibraryAsync({
-    mediaTypes: ["images"],
-    allowsEditing: true,
-    quality: 1,
-    aspect: [4, 3],
+  const source = await new Promise<"gallery" | "camera" | null>((resolve) => {
+    Alert.alert(
+      "Pilih Sumber Gambar",
+      "",
+      [
+        {
+          text: "Galeri Foto",
+          onPress: () => resolve("gallery"),
+        },
+        {
+          text: "Kamera",
+          onPress: () => resolve("camera"),
+        },
+        {
+          text: "Batal",
+          style: "cancel",
+          onPress: () => resolve(null),
+        },
+      ],
+      { cancelable: true }
+    );
   });
 
+  if (!source) return null;
+  let finalResult: ImagePicker.ImagePickerResult | null = null;
+  const options = {
+    allowsEditing: true,
+    quality: 1,
+    mediaTypes: ["images"], // Use constant for safety
+  };
+
+  if (source === "gallery") {
+    let permissionResult =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permissionResult.granted) {
+      Alert.alert("Izin akses galeri diperlukan!");
+      return null;
+    }
+    finalResult = await ImagePicker.launchImageLibraryAsync({
+      ...options,
+      mediaTypes: ["images"],
+      quality: 1,
+      allowsEditing: true,
+    });
+  } else if (source === "camera") {
+    // ⚠️ Request Camera Permissions
+    let cameraPermission = await ImagePicker.requestCameraPermissionsAsync();
+    let mediaLibraryPermission =
+      await ImagePicker.requestMediaLibraryPermissionsAsync(); // Camera also needs Media Library on Android/iOS to save the photo
+
+    if (!cameraPermission.granted || !mediaLibraryPermission.granted) {
+      Alert.alert("Izin kamera dan galeri diperlukan untuk mengambil foto.");
+      return null;
+    }
+    finalResult = await ImagePicker.launchCameraAsync({
+      ...options,
+      mediaTypes: ["images"],
+      quality: 1,
+      allowsEditing: true,
+      cameraType: ImagePicker.CameraType.back,
+    });
+  }
   if (
-    pickerResult.canceled ||
-    !pickerResult.assets ||
-    pickerResult.assets.length === 0
+    !finalResult ||
+    finalResult.canceled ||
+    !finalResult.assets ||
+    finalResult.assets.length === 0
   ) {
-    return null;
+    return null; // User canceled the picker/camera
   }
 
-  const selectedImage = pickerResult.assets[0].uri;
+  const selectedImage = finalResult.assets[0].uri;
   const filename = getFilenameFromUri(selectedImage);
 
   try {

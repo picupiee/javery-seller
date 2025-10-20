@@ -5,7 +5,7 @@ import { uploadImageToCloudinary } from "@/utils/cloudinary";
 import { selectAndManipulateImage } from "@/utils/imagePicker";
 import { router } from "expo-router";
 import React, { useState } from "react";
-import { Alert, ScrollView, Text, TextInput, View } from "react-native";
+import { Alert, Image, ScrollView, Text, TextInput, View } from "react-native";
 
 const AddProductScreen = () => {
   const { user } = useAuth();
@@ -137,10 +137,20 @@ const AddProductScreen = () => {
           className="p-3 border border-gray-300 rounded-lg"
         />
       </View>
-      <View className="mb-6">
-        <Text className="border-t-2 border-gray-400 pt-2">
-          Upload Foto Produk
-        </Text>
+      <View className="mb-6 border-t-2 border-b-2 pb-4 border-gray-400">
+        <Text className="pt-2 text-xs">Upload Foto Produk </Text>
+        {localImageUri ? (
+          <View className="my-2 w-full items-center">
+            <Text className="text-sm font-medium mb-2 text-gray-700">
+              Pratinjau Gambar:
+            </Text>
+            <Image
+              source={{ uri: localImageUri }}
+              className="w-40 h-40 rounded-lg border border-gray-300"
+              resizeMode="cover"
+            />
+          </View>
+        ) : null}
         <Buttons
           title={
             originalFilename
