@@ -1,6 +1,8 @@
 import Buttons from "@/components/ui/Buttons";
 import { useAuth } from "@/context/AuthContext";
 import { createProduct } from "@/lib/productService";
+import { uploadImageToCloudinary } from "@/utils/cloudinary";
+import { selectAndManipulateImage } from "@/utils/imagePicker";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import { Alert, ScrollView, Text, TextInput, View } from "react-native";
@@ -10,8 +12,18 @@ const AddProductScreen = () => {
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [stock, setStock] = useState("");
+  const [localImageUri, setLocalImageUri] = useState<string | null>(null);
+  const [originalFilename, setOriginalFilename] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const resetForm = () => {
+    setName("");
+    setPrice("");
+    setStock("");
+    setLocalImageUri(null);
+    setOriginalFilename(null);
+  };
 
   // 1. Validation
   const validate = () => {
@@ -33,6 +45,15 @@ const AddProductScreen = () => {
     }
     return true;
   };
+  // 1.A Image Selection
+  const handlePickImage = async () => {
+    const imageInfo = await selectAndManipulateImage();
+    if (imageInfo) {
+      setLocalImageUri(imageInfo.uri);
+      setOriginalFilename(imageInfo.filename);
+    }
+  };
+
   // 2. Submission
   const handleAddProduct = async () => {
     if (loading || !validate() || !user) return;
@@ -40,19 +61,22 @@ const AddProductScreen = () => {
     setError("");
 
     try {
+      let imageUrl = "";
+      if (localImageUri) {
+        imageUrl = await uploadImageToCloudinary(localImageUri, user!.uid);
+      }
+
       const newProduct = {
         ownerUid: user.uid,
         name: name.trim(),
         price: parseFloat(price),
         stock: parseInt(stock),
-        // imageUrl: "" // For later
+        imageUrl: imageUrl,
       };
 
       await createProduct(newProduct);
       Alert.alert("Berhasil", "Produk sukses ditambahkan.");
-      setName("");
-      setPrice("");
-      setStock("");
+      resetForm();
       router.replace("/dashboard/products");
     } catch (err: any) {
       console.error("Add product error: ", err);
@@ -60,6 +84,11 @@ const AddProductScreen = () => {
     } finally {
       setLoading(false);
     }
+  };
+  // Product Submission Cancellation
+  const handleCancel = () => {
+    router.replace("/dashboard/products");
+    resetForm();
   };
 
   return (
@@ -108,6 +137,21 @@ const AddProductScreen = () => {
           className="p-3 border border-gray-300 rounded-lg"
         />
       </View>
+      <View className="mb-6">
+        <Text className="border-t-2 border-gray-400 pt-2">
+          Upload Foto Produk
+        </Text>
+        <Buttons
+          title={
+            originalFilename
+              ? `${originalFilename}\nGanti Gambar`
+              : "Pilih Gambar"
+          }
+          onPress={handlePickImage}
+          className="mt-4 p-3 bg-blue-500 rounded-lg"
+          textStyle="text-white text-center font-semibold"
+        />
+      </View>
 
       {error ? (
         <Text className="text-red-500 font-semibold text-center mb-4">
@@ -127,7 +171,7 @@ const AddProductScreen = () => {
         title="Batal"
         className="p-3 bg-red-500 rounded-lg shadow-md mt-2"
         textStyle="text-white text-center font-bold text-lg"
-        onPress={() => router.replace("/dashboard/products")}
+        onPress={handleCancel}
       />
     </ScrollView>
   );

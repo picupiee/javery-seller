@@ -173,6 +173,13 @@ const EditProduct = () => {
         textStyle="text-white text-center font-bold text-lg"
         onPress={handleUpdateProduct}
       />
+      <Buttons
+        title="Batal"
+        isLoading={saving}
+        className="p-3 bg-red-500 rounded-lg shadow-md mt-2"
+        textStyle="text-white text-center font-bold text-lg"
+        onPress={() => router.replace("/dashboard/products")}
+      />
     </ScrollView>
   );
 };
