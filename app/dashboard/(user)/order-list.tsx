@@ -82,7 +82,7 @@ const orderList = () => {
   if (orders.length === 0) {
     return (
       <View className="flex-1 items-center justify-center p-6 bg-white">
-        <Ionicons name="sad-sharp" size={64} color="#9ca3af" />
+        <Ionicons name="checkmark-done-outline" size={64} color="#9ca3af" />
         <Text className="text-xl font-bold text-center text-gray-800 mb-2">
           Belum ada pesanan
         </Text>

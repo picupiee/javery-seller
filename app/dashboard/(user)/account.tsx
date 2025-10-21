@@ -34,7 +34,7 @@ const account = () => {
       setLoading(true);
       try {
         await logout();
-        router.replace("/sign-in");
+        router.replace("/");
       } catch (error) {
         console.error("Logout error: ", error);
         Alert.alert(

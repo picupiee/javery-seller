@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  Image,
   ScrollView,
   Text,
   TextInput,
@@ -18,6 +19,7 @@ const EditProduct = () => {
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [stock, setStock] = useState("");
+  const [productImage, setProductImage] = useState<string | null>(null);
 
   // UI State
   const [initialLoading, setInitialLoading] = useState(true);
@@ -40,6 +42,9 @@ const EditProduct = () => {
           setName(product.name);
           setPrice(product.price ? product.price.toString() : "0");
           setStock(product.stock ? product.stock.toString() : "0");
+          setProductImage(
+            product.imageUrl ? product.imageUrl.toString() : null
+          );
         } else {
           setError("Produk tidak ditemukan.");
         }
@@ -74,6 +79,17 @@ const EditProduct = () => {
     return true;
   };
 
+  const handleEditImage = async () => {
+    // const imageInfo = await selectAndManipulateImage();
+    // if (imageInfo) {
+    //   setProductImage(imageInfo.uri);
+    // }
+    Alert.alert(
+      "Fitur ini belum tersedia",
+      "Silahkan hapus produk ini dan buat ulang dengan gambar yang berbeda."
+    );
+  };
+
   // 3. Submission
   const handleUpdateProduct = async () => {
     if (saving || !validate() || !id) return;
@@ -85,6 +101,7 @@ const EditProduct = () => {
         name: name.trim(),
         price: parseFloat(price),
         stock: parseInt(stock),
+        imageUrl: productImage || "",
       };
       await updateProduct(id, updates);
 
@@ -120,6 +137,12 @@ const EditProduct = () => {
     );
   }
 
+  const cancelSubmission = () => {
+    setSaving(false);
+
+    router.replace("/dashboard/(user)/products");
+  };
+
   return (
     <ScrollView
       contentContainerStyle={{ flexGrow: 1 }}
@@ -127,6 +150,23 @@ const EditProduct = () => {
     >
       <Text className="text-2xl font-bold mb-8 text-gray-800">Edit Produk</Text>
       <View className="mb-4">
+        {productImage && (
+          <View className="mb-4 w-full h-64">
+            <Image
+              source={{ uri: productImage }}
+              className="w-full h-64 rounded-lg "
+              resizeMode="cover"
+            />
+            <View className="absolute bottom-4 left-4 right-4 z-10">
+              <Buttons
+                title="Ubah Gambar"
+                className="bg-blue-600/70 p-3 rounded-md"
+                textStyle="text-center text-white font-medium"
+                onPress={handleEditImage}
+              />
+            </View>
+          </View>
+        )}
         <Text className="text-sm font-medium mb-1 text-gray-700">
           Nama Produk
         </Text>
@@ -175,10 +215,9 @@ const EditProduct = () => {
       />
       <Buttons
         title="Batal"
-        isLoading={saving}
         className="p-3 bg-red-500 rounded-lg shadow-md mt-2"
         textStyle="text-white text-center font-bold text-lg"
-        onPress={() => router.replace("/dashboard/products")}
+        onPress={cancelSubmission}
       />
     </ScrollView>
   );
