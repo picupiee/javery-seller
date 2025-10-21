@@ -117,9 +117,14 @@ const products = () => {
   // Helper for single product
   const renderProductItem = ({ item }: { item: Product }) => {
     const isDeleting = deletingId === item.id;
+    const imageSrc = item.imageUrl;
     return (
       <View className="p-4 m-2 bg-white rounded-lg shadow-sm border border-gray-100 flex-row justify-between items-center">
-        <Image src={item.imageUrl} className="mr-2" />
+        <Image
+          className="mr-2 w-16 h-16 rounded"
+          source={{ uri: imageSrc }}
+          resizeMode="cover"
+        />
         <View className="flex-1 pr-4">
           <Text className="text-lg font-semibold">{item.name}</Text>
           <Text className="text-sm text-gray-700">Harga: Rp. {item.price}</Text>
