@@ -99,7 +99,7 @@ const signUp = () => {
           <Text className="text-md mt-2">Alamat Email</Text>
           <TextInput
             placeholder="contoh@gmail.com"
-            // value={email}
+            value={email}
             onChangeText={setEmail}
             keyboardType="email-address"
             className="p-2 text-black text-md border-2 border-gray-300 focus:border-black focus:outline-none"
