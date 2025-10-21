@@ -84,14 +84,14 @@ const signIn = () => {
             onChangeText={setEmail}
             keyboardType="email-address"
             autoCapitalize="none"
-            className="p-2 placeholder:text-gray-500 text-md border-2 border-gray-300 focus:border-black focus:outline-none rounded-md"
+            className="p-2 text-black text-md border-2 border-gray-300 focus:border-black focus:outline-none rounded-md"
           />
           <TextInput
             placeholder="Kata Sandi"
             secureTextEntry
             value={password}
             onChangeText={setPassword}
-            className="p-2 text-md placeholder:text-gray-500 border-2 border-gray-300 focus:border-black focus:outline-none rounded-md"
+            className="p-2 text-black text-md border-2 border-gray-300 focus:border-black focus:outline-none rounded-md"
           />
         </View>
         {error ? (

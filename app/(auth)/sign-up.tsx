@@ -102,7 +102,7 @@ const signUp = () => {
             // value={email}
             onChangeText={setEmail}
             keyboardType="email-address"
-            className="p-2 placeholder:text-gray-500 text-md border-2 border-gray-300 focus:border-black focus:outline-none transition-colors ease-in-out rounded-md"
+            className="p-2 text-black text-md border-2 border-gray-300 focus:border-black focus:outline-none"
           />
           <Text className="text-md mt-2">Password</Text>
           <TextInput
@@ -110,14 +110,14 @@ const signUp = () => {
             secureTextEntry
             value={password}
             onChangeText={setPassword}
-            className="p-2 text-md placeholder:text-gray-500 border-2 border-gray-300 focus:border-black focus:outline-none transition-colors ease-in-out rounded-md"
+            className="p-2 text-black text-md border-2 border-gray-300 focus:border-black focus:outline-none"
           />
           <Text className="text-md mt-2">Nama Toko</Text>
           <TextInput
             placeholder="Contoh: 'Kedai Puri'"
             value={storeName}
             onChangeText={setStoreName}
-            className="p-2 placeholder:text-gray-500 text-md border-2 border-gray-300 focus:border-black focus:outline-none transition-colors ease-in-out rounded-md"
+            className="p-2 te4xt-black text-md border-2 border-gray-300 focus:border-black focus:outline-none"
           />
         </View>
         {error ? (

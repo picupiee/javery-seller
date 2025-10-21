@@ -7,7 +7,14 @@ import {
 } from "@/lib/productService";
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { ActivityIndicator, Alert, FlatList, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  Alert,
+  FlatList,
+  Image,
+  Text,
+  View,
+} from "react-native";
 
 const products = () => {
   const { user } = useAuth();
@@ -112,6 +119,7 @@ const products = () => {
     const isDeleting = deletingId === item.id;
     return (
       <View className="p-4 m-2 bg-white rounded-lg shadow-sm border border-gray-100 flex-row justify-between items-center">
+        <Image src={item.imageUrl} className="mr-2" />
         <View className="flex-1 pr-4">
           <Text className="text-lg font-semibold">{item.name}</Text>
           <Text className="text-sm text-gray-700">Harga: Rp. {item.price}</Text>

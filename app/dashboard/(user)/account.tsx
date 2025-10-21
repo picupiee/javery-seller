@@ -2,7 +2,7 @@ import Buttons from "@/components/ui/Buttons";
 import { useAuth } from "@/context/AuthContext";
 import { router } from "expo-router";
 import React, { useState } from "react";
-import { Alert, Text, View } from "react-native";
+import { Alert, Platform, Text, View } from "react-native";
 
 const account = () => {
   const { user, logout } = useAuth();
@@ -11,6 +11,14 @@ const account = () => {
   const [loading, setLoading] = useState(false);
 
   const handleLogout = async () => {
+    if (Platform.OS === "web") {
+      const confirm = window.confirm(
+        "Yakin ingin keluar dari aplikasi Javery Seller ?"
+      );
+      if (confirm) {
+        logout();
+      }
+    }
     if (loading) return;
     const confirmLogout = () => {
       Alert.alert(

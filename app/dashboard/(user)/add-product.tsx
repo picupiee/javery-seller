@@ -108,7 +108,7 @@ const AddProductScreen = () => {
           value={name}
           onChangeText={setName}
           autoCapitalize="words"
-          className="p-3 border border-gray-300 rounded-lg"
+          className="p-3 border border-gray-300 rounded-lg placeholder:text-gray-400"
         />
       </View>
 
@@ -121,7 +121,7 @@ const AddProductScreen = () => {
           value={price}
           onChangeText={setPrice}
           keyboardType="numeric"
-          className="p-3 border border-gray-300 rounded-lg"
+          className="p-3 border border-gray-300 rounded-lg placeholder:text-gray-400"
         />
       </View>
 
@@ -134,7 +134,7 @@ const AddProductScreen = () => {
           value={stock}
           onChangeText={setStock}
           keyboardType="number-pad"
-          className="p-3 border border-gray-300 rounded-lg"
+          className="p-3 border border-gray-300 rounded-lg placeholder:text-gray-400"
         />
       </View>
       <View className="mb-6 border-t-2 border-b-2 pb-4 border-gray-400">
