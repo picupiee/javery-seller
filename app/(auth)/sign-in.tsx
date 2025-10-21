@@ -80,6 +80,7 @@ const signIn = () => {
         <View className="gap-2 w-1/2">
           <TextInput
             placeholder="Alamat Email"
+            placeholderTextColor={"gray"}
             value={email}
             onChangeText={setEmail}
             keyboardType="email-address"
@@ -88,6 +89,7 @@ const signIn = () => {
           />
           <TextInput
             placeholder="Kata Sandi"
+            placeholderTextColor={"gray"}
             secureTextEntry
             value={password}
             onChangeText={setPassword}

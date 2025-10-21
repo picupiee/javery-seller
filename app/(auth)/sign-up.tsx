@@ -99,6 +99,7 @@ const signUp = () => {
           <Text className="text-md mt-2">Alamat Email</Text>
           <TextInput
             placeholder="contoh@gmail.com"
+            placeholderTextColor={"gray"}
             value={email}
             onChangeText={setEmail}
             keyboardType="email-address"
@@ -107,6 +108,7 @@ const signUp = () => {
           <Text className="text-md mt-2">Password</Text>
           <TextInput
             placeholder="Masukkan kata sandi"
+            placeholderTextColor={"gray"}
             secureTextEntry
             value={password}
             onChangeText={setPassword}
@@ -115,9 +117,10 @@ const signUp = () => {
           <Text className="text-md mt-2">Nama Toko</Text>
           <TextInput
             placeholder="Contoh: 'Kedai Puri'"
+            placeholderTextColor={"gray"}
             value={storeName}
             onChangeText={setStoreName}
-            className="p-2 te4xt-black text-md border-2 border-gray-300 focus:border-black focus:outline-none"
+            className="p-2 text-black text-md border-2 border-gray-300 focus:border-black focus:outline-none"
           />
         </View>
         {error ? (
