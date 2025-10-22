@@ -1,20 +1,20 @@
 import useUpdates from "@/hooks/useUpdate";
 import { Ionicons } from "@expo/vector-icons";
-import { Link, Tabs } from "expo-router";
-import { Text, View } from "react-native";
+import { router, Tabs } from "expo-router";
+import { Pressable, Text, View } from "react-native";
 
 export default function RootLayout() {
   const { isUpdateAvailable } = useUpdates();
   const renderUpdateBanner = () => {
     if (!isUpdateAvailable) return null;
     return (
-      <Link href="/dashboard/(user)/account" asChild>
+      <Pressable onPress={() => router.push("/dashboard/(user)/account")}>
         <View className="bg-yellow-500 py-1 px-4 items-center">
           <Text className="text-sm text-white font-semibold text-center">
             Pembaruan Tersedia! Ketuk untuk menginstal.
           </Text>
         </View>
-      </Link>
+      </Pressable>
     );
   };
 

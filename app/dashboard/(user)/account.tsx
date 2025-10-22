@@ -17,7 +17,7 @@ const account = () => {
 
   const handleCheckUpdate = async () => {
     await activeCheckAndApplyUpdate();
-    if (updateStatus === "idle") {
+    if (updateStatus != "downloading") {
       Alert.alert("Status Pembaruan", "Aplikasi sudah versi terbaru.");
     }
   };
