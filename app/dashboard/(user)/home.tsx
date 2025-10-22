@@ -4,11 +4,11 @@ import {
   countOrderByStatus,
 } from "@/utils/orderService";
 import { countTotalProducts } from "@/utils/productService";
+import { showErrorToast } from "@/utils/toastUtils";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
-  Alert,
   Pressable,
   RefreshControl,
   ScrollView,
@@ -85,7 +85,7 @@ const home = () => {
       });
     } catch (error) {
       console.error("Failed to load dashboard metrics: ", error);
-      Alert.alert("Gagal Memuat", "Gagal memuat data metrik. Coba muat ulang.");
+      showErrorToast("Gagal Memuat Data Metrik. Silahkan coba lagi !");
     } finally {
       setLoading(false);
       setRefreshing(false);

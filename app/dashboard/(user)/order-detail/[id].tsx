@@ -1,5 +1,6 @@
 import Buttons from "@/components/ui/Buttons";
 import { Order, OrderStatus, getOrderById } from "@/utils/orderService";
+import { showSuccessToast } from "@/utils/toastUtils";
 import { Picker } from "@react-native-picker/picker";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
@@ -85,7 +86,7 @@ const OrderDetail = () => {
     setError(null);
 
     try {
-      Alert.alert(
+      showSuccessToast(
         "Sukses",
         `Status pesanan berubah menjadi "${statusLabels[selectedStatus]}"`
       );

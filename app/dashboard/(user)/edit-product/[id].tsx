@@ -93,10 +93,6 @@ const EditProduct = () => {
     // if (imageInfo) {
     //   setProductImage(imageInfo.uri);
     // }
-    // Alert.alert(
-    //   "Fitur ini belum tersedia",
-    //   "Silahkan hapus produk ini dan buat ulang dengan gambar yang berbeda."
-    // );
     showErrorToast(
       "Fitur ini belum tersedia",
       "Silahkan hapus produk ini dan buat ulang dengan gambar yang berbeda."
@@ -118,7 +114,6 @@ const EditProduct = () => {
       };
       await updateProduct(id, updates);
       Keyboard.dismiss();
-      // Alert.alert("Sukses", "Produk berhasil diperbarui");
       showSuccessToast(
         "Berhasil",
         `Produkmu ${updates.name} berhasil diperbarui.`
