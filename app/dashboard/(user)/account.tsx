@@ -1,7 +1,6 @@
 import Buttons from "@/components/ui/Buttons";
 import { useAuth } from "@/context/AuthContext";
 import useUpdates from "@/hooks/useUpdate";
-
 import { router } from "expo-router";
 import React, { useState } from "react";
 import { Alert, Platform, Text, View } from "react-native";
@@ -11,43 +10,23 @@ const account = () => {
   const storeName = user?.profile?.storeName || "Nama Toko Belum Ditetapkan";
   const email = user?.email || "Email tidak ditemukan";
   const [loading, setLoading] = useState(false);
-  const { checkForUpdates, error, updateStatus } = useUpdates();
+  const { updateStatus, error, checkForUpdates } = useUpdates();
+  const [isChecking, setIsChecking] = useState(false);
 
-  const handleUpdateApp = () => {
-    switch (updateStatus) {
-      case "checking":
-        return (
-          <Text className="text-xs text-blue-500 text-center bg-blue-500 py-1 mt-10">
-            Memerika Update Terbaru...
-          </Text>
-        );
-      case "downloading":
-        return (
-          <Text className="text-xs text-orange-500 text-center bg-orange-50 py-1 mt-10">
-            Mendownload Update...
-          </Text>
-        );
-      case "ready":
-        return (
-          <Text className="text-xs text-green-600 text-center bg-green-50 py-1 font-bold mt-10">
-            Update Tersedia !
-          </Text>
-        );
-      case "error":
-        return (
-          <Text
-            className="text-xs text-red-600 text-center bg-red-50 py-1"
-            onPress={checkForUpdates} // Calls the function to retry
-          >
-            Error pembaruan. Ketuk untuk coba lagi.
-          </Text>
-        );
-      default:
-        return (
-          <Text className="text-xs text-blue-600 text-center bg-blue-50 py-1">
-            Sudah versi terupdate
-          </Text>
-        );
+  const handleCheckUpdate = async () => {
+    setIsChecking(true);
+    try {
+      await checkForUpdates();
+      if (updateStatus === "idle") {
+        Alert.alert("Pembaruan", "Aplikasi Anda sudah versi terbaru.");
+      }
+    } catch (e) {
+      Alert.alert(
+        "Error",
+        "Gagal memeriksa pembaruan. Silakan coba lagi nanti."
+      );
+    } finally {
+      setIsChecking(false);
     }
   };
 
@@ -121,14 +100,24 @@ const account = () => {
         onPress={handleLogout}
       />
       <Buttons
-        title="Cek Pembaruan Aplikasi"
-        isLoading={loading}
-        onLoading="Proses Keluar..."
-        className="mt-8 p-3 bg-blue-600 rounded-md shadow-md"
-        textStyle="text-white text-center font-bold text-lg"
-        onPress={handleUpdateApp}
+        title={
+          isChecking
+            ? "Memeriksa..."
+            : updateStatus === "ready"
+              ? "Pembaruan Siap!"
+              : "Cek Pembaruan Aplikasi"
+        }
+        onPress={handleCheckUpdate}
+        isLoading={isChecking}
+        // Use the primary brand color (e.g., blue-500)
+        className={`p-4 rounded-lg mt-4 ${updateStatus === "ready" ? "bg-green-600" : "bg-blue-500"}`}
+        textStyle="text-white text-center font-semibold"
       />
-      {updateStatus && <View className="mt-2">{updateStatus}</View>}
+      {updateStatus === "error" && (
+        <Text className="text-red-500 text-sm mt-2 text-center">
+          {error || "Gagal memeriksa. Coba lagi nanti."}
+        </Text>
+      )}
     </View>
   );
 };
