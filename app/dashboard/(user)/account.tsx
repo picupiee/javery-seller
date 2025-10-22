@@ -43,7 +43,11 @@ const account = () => {
           </Text>
         );
       default:
-        return null;
+        return (
+          <Text className="text-xs text-blue-600 text-center bg-blue-50 py-1">
+            Sudah versi terupdate
+          </Text>
+        );
     }
   };
 
@@ -120,7 +124,7 @@ const account = () => {
         title="Cek Pembaruan Aplikasi"
         isLoading={loading}
         onLoading="Proses Keluar..."
-        className="mt-8 p-3 bg-red-600 rounded-md shadow-md"
+        className="mt-8 p-3 bg-blue-600 rounded-md shadow-md"
         textStyle="text-white text-center font-bold text-lg"
         onPress={handleUpdateApp}
       />
