@@ -27,13 +27,35 @@ export interface Product {
   createdAt: string;
 }
 
+const FIRESTORE_TIMEOUT_MS = 5000;
+
+const withTimeout = <T>(promise: Promise<T>): Promise<T> => {
+  const timeoutPromise = new Promise<T>((_, reject) => {
+    const id = setTimeout(() => {
+      clearTimeout(id);
+      reject(new Error("TimeoutError: Firestore operation timed out"));
+    }, FIRESTORE_TIMEOUT_MS);
+  });
+  return Promise.race([promise, timeoutPromise]);
+};
+
+/**
+ * Maps a Firestore document snapshot to the Product interface.
+ */
+const mapDocToProduct = (doc: DocumentData): Product => {
+  // We cast to Product and assert all required fields are present (as per rules)
+  return {
+    id: doc.id,
+    ...doc.data(),
+  } as Product;
+};
+
 /**
  * Sets up a real-time listener for products belonging to a specific seller.
  * @param ownerUid The UID of the currently logged-in seller.
  * @param callback A function to execute every time the product list changes.
  * @returns An unsubscribe function to stop the listener when the component unmounts.
  */
-
 export const subscribeToSellerProducts = (
   ownerUid: string,
   callback: (products: Product[]) => void
@@ -52,10 +74,11 @@ export const subscribeToSellerProducts = (
       const products: Product[] = [];
 
       querySnapshot.forEach((doc) => {
-        products.push({
-          id: doc.id,
-          ...doc.data(),
-        } as Product);
+        // products.push({
+        //   id: doc.id,
+        //   ...doc.data(),
+        // } as Product);
+        products.push(mapDocToProduct(doc) as Product);
       });
       callback(products);
     },
@@ -71,7 +94,6 @@ export const subscribeToSellerProducts = (
  * Delete a product document from Firestore
  * @param productId The unique ID of the product document to delete
  */
-
 export const deleteProduct = async (productId: string): Promise<void> => {
   try {
     const productRef = doc(db, "products", productId);
@@ -89,20 +111,29 @@ export const deleteProduct = async (productId: string): Promise<void> => {
  * Creating a new product document to the Firestore
  * @param productData A product information gathered from the seller
  */
-
 export const createProduct = async (
   productData: Omit<Product, "id" | "createdAt">
 ): Promise<string> => {
   try {
     const productsRef = collection(db, "products");
-    const docRef = await addDoc(productsRef, {
-      ...productData,
-      createdAt: serverTimestamp(),
-    });
+    const docRef = await withTimeout(
+      addDoc(productsRef, {
+        ...productData,
+        createdAt: serverTimestamp(),
+      })
+    );
     return docRef.id;
-  } catch (error) {
-    console.error("Error creating product: ", error);
-    throw new Error("Gagal menyimpan produk baru. Silahkan coba lagi.");
+  } catch (error: any) {
+    // 💡 Check for the distinct TimeoutError message
+    if (error.message.includes("TimeoutError")) {
+      throw new Error(
+        "Gagal menyimpan produk. Waktu koneksi habis. Silakan periksa jaringan Anda."
+      );
+    }
+    // General network failure/other errors
+    throw new Error(
+      "Gagal menyimpan produk. Periksa koneksi internet anda dan coba kembali."
+    );
   }
 };
 
@@ -117,7 +148,7 @@ export const getProductById = async (
 ): Promise<Product | null> => {
   try {
     const productRef = doc(db, "products", productId);
-    const docSnap = await getDoc(productRef);
+    const docSnap = await withTimeout(getDoc(productRef));
 
     if (docSnap.exists()) {
       return {
@@ -145,10 +176,18 @@ export const updateProduct = async (
   try {
     const productRef = doc(db, "products", productId);
 
-    await updateDoc(productRef, updates);
-  } catch (error) {
-    console.error("Error updating product : ", error, productId);
-    throw new Error("Gagal memperbarui produk. Silahkan coba kembali.");
+    await withTimeout(updateDoc(productRef, updates));
+  } catch (error: any) {
+    // 💡 Check for the distinct TimeoutError message
+    if (error.message.includes("TimeoutError")) {
+      throw new Error(
+        "Gagal menyimpan produk. Waktu koneksi habis. Silakan periksa jaringan Anda."
+      );
+    }
+    // General network failure/other errors
+    throw new Error(
+      "Gagal menyimpan produk. Periksa koneksi internet anda dan coba kembali."
+    );
   }
 };
 
@@ -158,25 +197,36 @@ export const getSellerProducts = async (
   try {
     const productsRef = collection(db, "products");
     const q = query(productsRef, where("ownerUid", "==", ownerUid));
-    const querySnapshot: QuerySnapshot<DocumentData> = await getDocs(q);
+    const querySnapshot: QuerySnapshot<DocumentData> = await withTimeout(
+      getDocs(q)
+    );
     const products: Product[] = [];
 
     querySnapshot.forEach((doc) => {
-      products.push({
-        id: doc.id,
-        ...doc.data(),
-      } as Product);
+      // products.push({
+      //   id: doc.id,
+      //   ...doc.data(),
+      // } as Product);
+      products.push(mapDocToProduct(doc) as Product);
     });
     return products;
-  } catch (error) {
-    console.error("Error fetching seller products: ", error);
-    throw new Error("Gagal mengambil daftar produk. Silahkan coba kembali.  ");
+  } catch (error: any) {
+    // 💡 Check for the distinct TimeoutError message
+    if (error.message.includes("TimeoutError")) {
+      throw new Error(
+        "Gagal mengambil daftar produk. Waktu koneksi habis. Silakan periksa jaringan Anda."
+      );
+    }
+    // General network failure/other errors
+    throw new Error(
+      "Gagal mengambil daftar produk. Periksa koneksi internet anda dan coba kembali."
+    );
   }
 };
 
 export const countTotalProducts = async (ownerUid: string): Promise<number> => {
   const productsRef = collection(db, "products");
   const q = query(productsRef, where("ownerUid", "==", ownerUid));
-  const querySnapshot = await getDocs(q);
+  const querySnapshot = await withTimeout(getDocs(q));
   return querySnapshot.size;
 };

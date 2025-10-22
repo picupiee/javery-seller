@@ -3,6 +3,8 @@ const CLOUDINARY_CLOUD_NAME =
   process.env.EXPO_PUBLIC_CLOUDINARY_CLOUD_NAME || "dazl8oipc";
 const CLOUDINARY_UPLOAD_PRESET = "javery_products-";
 
+const CLOUDINARY_TIMEOUT_MS = 60000;
+
 /**
  * Uploads a local file URI (from expo-image-picker/manipulator) directly to Cloudinary.
  * @param {string} uri - The local file path (e.g., file:///...) of the image to upload.
@@ -45,11 +47,19 @@ export const uploadImageToCloudinary = async (
   // Appen the dynamic folder path
   //   formData.append("folder", dynamicFolder);
 
+  const controller = new AbortController();
+  const signal = controller.signal;
+
+  const timeoutId = setTimeout(() => controller.abort(), CLOUDINARY_TIMEOUT_MS);
+
   try {
     const response = await fetch(CLOUDINARY_URL, {
       method: "POST",
       body: formData,
+      signal: signal,
     });
+
+    clearTimeout(timeoutId);
 
     const data = await response.json();
 
@@ -63,6 +73,7 @@ export const uploadImageToCloudinary = async (
     console.log(data.secure_url);
     return data.secure_url;
   } catch (error) {
+    clearTimeout(timeoutId);
     console.error("Network or Cloudinary Upload Error:", error);
     // Re-throw a generic error for the calling component
     throw new Error("Failed to upload image. Check network connection.");

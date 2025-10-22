@@ -1,7 +1,44 @@
+import useUpdates from "@/hooks/useUpdate";
 import { Ionicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
+import { Text } from "react-native";
 
 export default function RootLayout() {
+  const { updateStatus, error, checkForUpdates } = useUpdates();
+
+  const renderUpdateStatus = () => {
+    switch (updateStatus) {
+      case "checking":
+        return (
+          <Text className="text-xs text-blue-500 text-center bg-blue-500 py-1">
+            Memerika Update Terbaru...
+          </Text>
+        );
+      case "downloading":
+        return (
+          <Text className="text-xs text-orange-500 text-center bg-orange-50 py-1">
+            Mendownload Update...
+          </Text>
+        );
+      case "ready":
+        return (
+          <Text className="text-xs text-green-600 text-center bg-green-50 py-1 font-bold">
+            Update Tersedia !
+          </Text>
+        );
+      case "error":
+        return (
+          <Text
+            className="text-xs text-red-600 text-center bg-red-50 py-1"
+            onPress={checkForUpdates} // Calls the function to retry
+          >
+            Error pembaruan. Ketuk untuk coba lagi.
+          </Text>
+        );
+      default:
+        return null;
+    }
+  };
   return (
     <Tabs
       screenOptions={{
@@ -15,6 +52,7 @@ export default function RootLayout() {
         },
       }}
     >
+      {renderUpdateStatus()}
       <Tabs.Screen
         name="home"
         options={{

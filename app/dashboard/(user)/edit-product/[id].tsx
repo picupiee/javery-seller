@@ -1,5 +1,5 @@
 import Buttons from "@/components/ui/Buttons";
-import { getProductById, updateProduct } from "@/lib/productService";
+import { getProductById, Product, updateProduct } from "@/lib/productService";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
@@ -20,6 +20,7 @@ const EditProduct = () => {
   const [price, setPrice] = useState("");
   const [stock, setStock] = useState("");
   const [productImage, setProductImage] = useState<string | null>(null);
+  const [originalProduct, setOriginalProduct] = useState<Product | null>(null);
 
   // UI State
   const [initialLoading, setInitialLoading] = useState(true);
@@ -27,34 +28,39 @@ const EditProduct = () => {
   const [error, setError] = useState("");
 
   // 1. Loading Data
-  useEffect(() => {
+
+  const loadProduct = async () => {
     if (!id) {
-      setError("ID Produk tidak ditemukan.");
+      setError("ID Produk tidak ditemukan");
       setInitialLoading(false);
       return;
     }
+    setError("");
+    setInitialLoading(true);
 
-    const loadProduct = async () => {
-      try {
-        const product = await getProductById(id);
+    try {
+      const productId = id as string;
+      const product = await getProductById(productId);
 
-        if (product) {
-          setName(product.name);
-          setPrice(product.price ? product.price.toString() : "0");
-          setStock(product.stock ? product.stock.toString() : "0");
-          setProductImage(
-            product.imageUrl ? product.imageUrl.toString() : null
-          );
-        } else {
-          setError("Produk tidak ditemukan.");
-        }
-      } catch (err: any) {
-        console.error("Load product error :", err);
-        setError("Gagal memuat informasi produk.");
-      } finally {
-        setInitialLoading(false);
+      if (product) {
+        setName(product.name);
+        setPrice(product.price ? product.price.toString() : "0");
+        setStock(product.stock ? product.stock.toString() : "0");
+        setProductImage(product.imageUrl ? product.imageUrl.toString() : null);
+        setOriginalProduct(product);
+      } else {
+        setError("Produk tidak ditemukan.");
       }
-    };
+    } catch (err: any) {
+      console.error("Load product error :", err);
+      // Use a clearer error for the user
+      setError("Gagal memuat informasi produk. Cek koneksi Anda.");
+    } finally {
+      setInitialLoading(false);
+    }
+  };
+
+  useEffect(() => {
     loadProduct();
   }, [id]);
 
@@ -133,13 +139,35 @@ const EditProduct = () => {
         <Text className="text-red-600 font-semibold mb-4 text-center">
           {error}
         </Text>
+        <Buttons
+          title="Coba Lagi"
+          className="p-3 bg-blue-500 rounded-lg shadow-md w-full"
+          textStyle="text-white text-center font-bold text-lg"
+          // ⚠️ Call the product loading function here
+          onPress={() => loadProduct()}
+        />
+        <Buttons
+          title="Batal"
+          className="p-3 bg-red-500 rounded-lg shadow-md mt-2"
+          textStyle="text-white text-center font-bold text-lg"
+          // This navigates back to the previous screen (product list)
+          onPress={() => router.back()}
+        />
       </View>
     );
   }
 
-  const cancelSubmission = () => {
-    setSaving(false);
-
+  const cancelSubmission = async () => {
+    if (originalProduct) {
+      // Reset all states back to the original values
+      setName(originalProduct.name);
+      setPrice(originalProduct.price ? originalProduct.price.toString() : "0");
+      setStock(originalProduct.stock ? originalProduct.stock.toString() : "0");
+      setProductImage(
+        originalProduct.imageUrl ? originalProduct.imageUrl.toString() : null
+      );
+      setError(""); // Clear any error messages
+    }
     router.replace("/dashboard/(user)/products");
   };
 

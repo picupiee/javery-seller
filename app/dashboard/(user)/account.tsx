@@ -1,5 +1,6 @@
 import Buttons from "@/components/ui/Buttons";
 import { useAuth } from "@/context/AuthContext";
+
 import { router } from "expo-router";
 import React, { useState } from "react";
 import { Alert, Platform, Text, View } from "react-native";
@@ -9,6 +10,7 @@ const account = () => {
   const storeName = user?.profile?.storeName || "Nama Toko Belum Ditetapkan";
   const email = user?.email || "Email tidak ditemukan";
   const [loading, setLoading] = useState(false);
+  
 
   const handleLogout = async () => {
     if (Platform.OS === "web") {
