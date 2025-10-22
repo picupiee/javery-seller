@@ -1,5 +1,6 @@
 import Buttons from "@/components/ui/Buttons";
 import { auth } from "@/lib/firebase";
+import { showSuccessToast } from "@/utils/toastUtils";
 import { router } from "expo-router";
 import { sendPasswordResetEmail } from "firebase/auth";
 import React, { useState } from "react";
@@ -30,10 +31,7 @@ const resetPassword = () => {
       if (Platform.OS === "web") {
         window.alert(successMessage);
       } else {
-        Alert.alert(
-          "Reset Password Berhasil",
-          "Silahkan cek kotak masuk email anda untuk melanjutkan."
-        );
+        showSuccessToast("Reset Password Berhasil", "Silahkan cek kotak masuk email anda untuk melanjutkan.")
       }
       router.replace("/sign-in");
     } catch (error: any) {

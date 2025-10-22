@@ -3,10 +3,10 @@ import { useAuth } from "@/context/AuthContext";
 import { uploadImageToCloudinary } from "@/utils/cloudinary";
 import { selectAndManipulateImage } from "@/utils/imagePicker";
 import { createProduct } from "@/utils/productService";
+import { showErrorToast, showSuccessToast } from "@/utils/toastUtils";
 import { router } from "expo-router";
 import React, { useRef, useState } from "react";
 import {
-  Alert,
   Image,
   Keyboard,
   ScrollView,
@@ -82,17 +82,23 @@ const AddProductScreen = () => {
         imageUrl: imageUrl,
       };
       if (!imageUrl) {
-        setError("Harus menyertakan Gambar Produk !");
+        showErrorToast("Harus Menyertakan Foto Produk");
         return;
       }
       Keyboard.dismiss();
       await createProduct(newProduct);
-      Alert.alert("Berhasil", "Produk sukses ditambahkan.");
+      showSuccessToast(
+        "Berhasil menambahkan produk.",
+        `Produk ${newProduct.name} telah ditambahkan kedalam tokomu.`
+      );
       resetForm();
       router.replace("/dashboard/products");
     } catch (err: any) {
       console.error("Add product error: ", err);
-      setError(err.message || "Gagal menyimpan produk. Silahkan coba kembali.");
+      // setError(err.message || "Gagal menyimpan produk. Silahkan coba kembali.");
+      showErrorToast(
+        "Gagal menyimpan produk. Cek koneksi internetmu dan coba lagi."
+      );
     } finally {
       setLoading(false);
     }

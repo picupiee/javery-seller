@@ -1,6 +1,7 @@
 import Buttons from "@/components/ui/Buttons";
 import { useAuth } from "@/context/AuthContext";
 import useUpdates from "@/hooks/useUpdate";
+import { showSuccessToast } from "@/utils/toastUtils";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import { Alert, Platform, Text, View } from "react-native";
@@ -17,8 +18,8 @@ const account = () => {
 
   const handleCheckUpdate = async () => {
     await activeCheckAndApplyUpdate();
-    if (updateStatus != "downloading") {
-      Alert.alert("Status Pembaruan", "Aplikasi sudah versi terbaru.");
+    if (updateStatus) {
+      showSuccessToast("Aplikasi sudah versi terbaru.");
     }
   };
 

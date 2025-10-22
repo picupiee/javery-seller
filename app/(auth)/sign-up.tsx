@@ -1,10 +1,11 @@
 import Buttons from "@/components/ui/Buttons";
 import { auth, db } from "@/lib/firebase";
+import { showErrorToast, showSuccessToast } from "@/utils/toastUtils";
 import { router } from "expo-router";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import React, { useState } from "react";
-import { Alert, Platform, Text, TextInput, View } from "react-native";
+import { Platform, Text, TextInput, View } from "react-native";
 
 const isValidEmail = (email: string) => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -55,9 +56,13 @@ const signUp = () => {
       if (Platform.OS === "web") {
         window.alert(successMessage);
       } else {
-        Alert.alert(
+        // Alert.alert(
+        //   `Selamat Datang ${storeName}`,
+        //   "Tekan OK untuk melanjutkan."
+        // );
+        showSuccessToast(
           `Selamat Datang ${storeName}`,
-          "Tekan OK untuk melanjutkan."
+          "Mulai berjualan dengan menambahkan produkmu !"
         );
       }
       router.push("/dashboard/home");
@@ -81,7 +86,7 @@ const signUp = () => {
       }
       setError(userFriendlyError);
       if (Platform.OS !== "web") {
-        Alert.alert("Gagal mendaftar !", userFriendlyError);
+        showErrorToast("Gagal Mendaftar !", userFriendlyError);
       }
       return;
     } finally {

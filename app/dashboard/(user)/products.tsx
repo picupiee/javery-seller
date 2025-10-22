@@ -5,6 +5,7 @@ import {
   Product,
   subscribeToSellerProducts,
 } from "@/utils/productService";
+import { showErrorToast, showSuccessToast } from "@/utils/toastUtils";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
@@ -57,12 +58,15 @@ const products = () => {
 
     try {
       await deleteProduct(productId);
-      Alert.alert("Sukses", "Produk telah dihapus dari tokomu.");
+      showSuccessToast(
+        "Produk Berhasil Dihapus",
+        `Produkmu telah dihapus dari Tokomu !`
+      );
     } catch (e: any) {
       console.error(e);
-      Alert.alert(
-        "Gagal Menghapus",
-        e.message || "Gagal menghapus produk. Coba lagi."
+      showErrorToast(
+        "Gagal Menghapus Produk!",
+        "Ada kesalahan. Silahkan ulangi kembali."
       );
     } finally {
       setDeletingId(null);

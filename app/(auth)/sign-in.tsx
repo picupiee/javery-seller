@@ -1,9 +1,10 @@
 import Buttons from "@/components/ui/Buttons";
 import { auth } from "@/lib/firebase";
+import { showErrorToast } from "@/utils/toastUtils";
 import { router } from "expo-router";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import React, { useState } from "react";
-import { Alert, Platform, Text, TextInput, View } from "react-native";
+import React, { useRef, useState } from "react";
+import { Platform, Text, TextInput, View } from "react-native";
 
 const isValidEmail = (email: string) => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -17,6 +18,7 @@ const signIn = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const passwordRef = useRef<TextInput>(null);
 
   const handleSignIn = async () => {
     if (loading) return;
@@ -34,12 +36,6 @@ const signIn = () => {
 
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      const successMessage = "Selamat Datang\nKlik OK untuk melanjutkan.";
-      if (Platform.OS === "web") {
-        window.alert(successMessage);
-      } else {
-        Alert.alert(`Selamat Datang`, "Tekan OK untuk melanjutkan.");
-      }
       router.push("/dashboard/home");
     } catch (error: any) {
       console.error("Sign-In error :", error.code, error.message);
@@ -64,7 +60,7 @@ const signIn = () => {
       }
       setError(userFriendlyError);
       if (Platform.OS !== "web") {
-        Alert.alert("Gagal masuk !", userFriendlyError);
+        showErrorToast("Gagal Masuk !", userFriendlyError);
       }
     } finally {
       setLoading(false);
@@ -86,14 +82,18 @@ const signIn = () => {
             keyboardType="email-address"
             autoCapitalize="none"
             className="p-2 text-black text-md border-2 border-gray-300 focus:border-black focus:outline-none rounded-md"
+            returnKeyType="next"
           />
           <TextInput
+            ref={passwordRef}
             placeholder="Kata Sandi"
             placeholderTextColor={"gray"}
             secureTextEntry
             value={password}
             onChangeText={setPassword}
             className="p-2 text-black text-md border-2 border-gray-300 focus:border-black focus:outline-none rounded-md"
+            returnKeyType="done"
+            onSubmitEditing={handleSignIn}
           />
         </View>
         {error ? (

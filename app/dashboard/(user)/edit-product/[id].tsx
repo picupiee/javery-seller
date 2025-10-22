@@ -1,10 +1,10 @@
 import Buttons from "@/components/ui/Buttons";
 import { getProductById, Product, updateProduct } from "@/utils/productService";
+import { showErrorToast, showSuccessToast } from "@/utils/toastUtils";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
-  Alert,
   Image,
   Keyboard,
   ScrollView,
@@ -27,6 +27,8 @@ const EditProduct = () => {
   const [initialLoading, setInitialLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const priceRef = useRef<TextInput>(null);
+  const stockRef = useRef<TextInput>(null);
 
   // 1. Loading Data
 
@@ -91,7 +93,11 @@ const EditProduct = () => {
     // if (imageInfo) {
     //   setProductImage(imageInfo.uri);
     // }
-    Alert.alert(
+    // Alert.alert(
+    //   "Fitur ini belum tersedia",
+    //   "Silahkan hapus produk ini dan buat ulang dengan gambar yang berbeda."
+    // );
+    showErrorToast(
       "Fitur ini belum tersedia",
       "Silahkan hapus produk ini dan buat ulang dengan gambar yang berbeda."
     );
@@ -111,13 +117,18 @@ const EditProduct = () => {
         imageUrl: productImage || "",
       };
       await updateProduct(id, updates);
-      Keyboard.dismiss()
-      Alert.alert("Sukses", "Produk berhasil diperbarui");
+      Keyboard.dismiss();
+      // Alert.alert("Sukses", "Produk berhasil diperbarui");
+      showSuccessToast(
+        "Berhasil",
+        `Produkmu ${updates.name} berhasil diperbarui.`
+      );
       router.replace("/dashboard/products");
     } catch (err: any) {
       console.error("Update product error :", err);
-      setError(
-        err.message || "Gagal memperbarui produk anda. Silahkan coba lagi."
+      showErrorToast(
+        "Gagal Memperbarui Produk.",
+        "Cek koneksi internetmu dan coba lagi."
       );
     } finally {
       setSaving(false);
@@ -171,9 +182,6 @@ const EditProduct = () => {
     }
     router.replace("/dashboard/(user)/products");
   };
-
-  const priceRef = useRef<TextInput>(null);
-  const stockRef = useRef<TextInput>(null);
 
   return (
     <ScrollView

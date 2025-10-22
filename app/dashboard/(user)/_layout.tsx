@@ -3,6 +3,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { router, Tabs } from "expo-router";
 import { Pressable, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Toast from "react-native-toast-message"
 
 export default function RootLayout() {
   const { isUpdateAvailable } = useUpdates();
@@ -92,6 +93,7 @@ export default function RootLayout() {
           }}
         />
       </Tabs>
+      <Toast />
     </SafeAreaView>
   );
 }
