@@ -2,7 +2,6 @@ import useUpdates from "@/hooks/useUpdate";
 import { Ionicons } from "@expo/vector-icons";
 import { Link, Tabs } from "expo-router";
 import { Text, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function RootLayout() {
   const { isUpdateAvailable } = useUpdates();
@@ -20,7 +19,7 @@ export default function RootLayout() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <View style={{ flex: 1 }}>
       {renderUpdateBanner()}
       <Tabs
         screenOptions={{
@@ -92,6 +91,6 @@ export default function RootLayout() {
           }}
         />
       </Tabs>
-    </SafeAreaView>
+    </View>
   );
 }

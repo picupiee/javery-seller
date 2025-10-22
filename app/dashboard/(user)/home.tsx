@@ -127,7 +127,7 @@ const home = () => {
 
   return (
     <ScrollView
-      className="flex-1 p-4 bg-white"
+      className="flex-1 p-4 bg-white mt-5"
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
       }
