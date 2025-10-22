@@ -203,7 +203,7 @@ const EditProduct = () => {
           value={name}
           onChangeText={setName}
           autoCapitalize="words"
-          className="p-3 border border-gray-300 rounded-lg"
+          className="p-3 border border-gray-300 rounded-lg focus:border-orange-500"
         />
       </View>
 
@@ -215,8 +215,8 @@ const EditProduct = () => {
           placeholder="Contoh: 25000"
           value={price}
           onChangeText={setPrice}
-          keyboardType="numeric"
-          className="p-3 border border-gray-300 rounded-lg"
+          keyboardType="decimal-pad"
+          className="p-3 border border-gray-300 rounded-lg focus:border-orange-500"
         />
       </View>
 
@@ -228,8 +228,8 @@ const EditProduct = () => {
           placeholder="Contoh: 100"
           value={stock}
           onChangeText={setStock}
-          keyboardType="number-pad"
-          className="p-3 border border-gray-300 rounded-lg"
+          keyboardType="decimal-pad"
+          className="p-3 border border-gray-300 rounded-lg focus:border-orange-500"
         />
       </View>
 
@@ -237,7 +237,7 @@ const EditProduct = () => {
         title="Simpan"
         onLoading="Menyimpan..."
         isLoading={saving}
-        className="p-3 bg-orange-500 rounded-lg shadow-md"
+        className="p-3 bg-orange-600 rounded-lg shadow-md"
         textStyle="text-white text-center font-bold text-lg"
         onPress={handleUpdateProduct}
       />

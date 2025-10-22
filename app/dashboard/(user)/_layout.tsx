@@ -10,8 +10,8 @@ export default function RootLayout() {
     if (!isUpdateAvailable) return null;
     return (
       <Pressable onPress={() => router.push("/dashboard/(user)/account")}>
-        <View className="bg-yellow-500 py-1 px-4 items-center">
-          <Text className="text-sm text-white font-semibold text-center">
+        <View className="bg-orange-100 py-1 px-4 items-center">
+          <Text className="text-sm font-semibold text-center text-orange-700">
             Pembaruan Tersedia! Ketuk untuk menginstal.
           </Text>
         </View>

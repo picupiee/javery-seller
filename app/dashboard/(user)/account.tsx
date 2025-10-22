@@ -62,19 +62,19 @@ const account = () => {
 
   return (
     <View className="flex-1 p-6">
-      <View className="bg-slate-300 p-4 rounded-lg shadow-md mb-8">
+      <View className="bg-slate-200 p-4 rounded-lg shadow-md mb-8">
         <Text className="text-xl font-bold mb-4 text-gray-800">
           Informasi Akun
         </Text>
         <View className="mb-3">
           <Text className="text-xs text-gray-500">Toko Anda</Text>
-          <Text className="text-lg font-semibold text-orange-600">
+          <Text className="text-lg font-semibold text-orange-500">
             {storeName}
           </Text>
         </View>
         <View className="mb-3">
           <Text className="text-xs text-gray-500">Email Anda</Text>
-          <Text className="text-lg font-semibold text-orange-600">{email}</Text>
+          <Text className="text-lg font-semibold text-orange-500">{email}</Text>
         </View>
       </View>
       {/* Reserved for button section (Change Password, Store Name, all related store and account settings) */}
@@ -102,7 +102,7 @@ const account = () => {
         onPress={handleCheckUpdate}
         isLoading={isChecking}
         // Use color cues based on status
-        className={`p-4 rounded-lg mt-4 ${updateStatus === "ready" ? "bg-green-600" : "bg-blue-500"}`}
+        className={`p-4 rounded-lg mt-4 ${updateStatus === "ready" ? "bg-green-600" : "bg-orange-600"}`}
         textStyle="text-white text-center font-semibold"
       />
       {updateStatus === "error" && (

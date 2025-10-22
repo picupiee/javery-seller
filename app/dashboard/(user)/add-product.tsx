@@ -108,7 +108,7 @@ const AddProductScreen = () => {
           value={name}
           onChangeText={setName}
           autoCapitalize="words"
-          className="p-3 border border-gray-300 rounded-lg placeholder:text-gray-400"
+          className="p-3 border border-gray-300 rounded-lg placeholder:text-gray-400 focus:border-orange-500"
         />
       </View>
 
@@ -120,8 +120,8 @@ const AddProductScreen = () => {
           placeholder="Contoh: 25000"
           value={price}
           onChangeText={setPrice}
-          keyboardType="numeric"
-          className="p-3 border border-gray-300 rounded-lg placeholder:text-gray-400"
+          keyboardType="decimal-pad"
+          className="p-3 border border-gray-300 rounded-lg placeholder:text-gray-400 focus:border-orange-500"
         />
       </View>
 
@@ -133,8 +133,8 @@ const AddProductScreen = () => {
           placeholder="Contoh: 100"
           value={stock}
           onChangeText={setStock}
-          keyboardType="number-pad"
-          className="p-3 border border-gray-300 rounded-lg placeholder:text-gray-400"
+          keyboardType="decimal-pad"
+          className="p-3 border border-gray-300 rounded-lg placeholder:text-gray-400 focus:border-orange-500"
         />
       </View>
       <View className="mb-6 border-t-2 border-b-2 pb-4 border-gray-400">

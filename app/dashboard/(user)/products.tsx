@@ -5,6 +5,7 @@ import {
   Product,
   subscribeToSellerProducts,
 } from "@/lib/productService";
+import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
@@ -12,9 +13,20 @@ import {
   Alert,
   FlatList,
   Image,
+  LayoutAnimation,
+  Platform,
+  RefreshControl,
   Text,
+  UIManager,
   View,
 } from "react-native";
+
+if (
+  Platform.OS === "android" &&
+  UIManager.setLayoutAnimationEnabledExperimental
+) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
 
 const products = () => {
   const { user } = useAuth();
@@ -22,8 +34,14 @@ const products = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const handleRetry = () => {
+    setRefreshTrigger((prev) => prev + 1);
+  };
+
+  const onRefresh = () => {
+    setIsRefreshing(true);
     setRefreshTrigger((prev) => prev + 1);
   };
 
@@ -46,6 +64,7 @@ const products = () => {
 
   const executeDelete = async (productId: string) => {
     setDeletingId(productId);
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     try {
       await deleteProduct(productId);
       Alert.alert("Sukses", "Produk telah dihapus dari tokomu.");
@@ -66,12 +85,16 @@ const products = () => {
       return;
     }
 
-    setLoading(true);
+    if (refreshTrigger > 0) {
+    } else {
+      setLoading(true);
+    }
     setError(null);
 
     const unsubscribe = subscribeToSellerProducts(user.uid, (newProducts) => {
       setProducts(newProducts);
       setLoading(false);
+      setIsRefreshing(false);
     });
     return () => unsubscribe();
   }, [user, refreshTrigger]);
@@ -90,9 +113,11 @@ const products = () => {
     return (
       <View className="flex-1 items-center justify-center p-4">
         <Text className="text-red-600 font-semibold mb-4">{error}</Text>
-        <Text className="text-blue-500 underline" onPress={handleRetry}>
-          Coba muat ulang
-        </Text>
+        <Buttons
+          title="Muat Ulang"
+          onPress={handleRetry}
+          className="mt-4 bg-orange-600 p-3 rounded-lg"
+        />
       </View>
     );
   }
@@ -100,16 +125,17 @@ const products = () => {
   if (products.length === 0) {
     return (
       <View className="flex-1 items-center justify-center p-6 bg-gray-50">
-        <Text className="text-xl font-bold text-gray-800 mb-2">
-          Belum ada produk
+        <Ionicons name="basket-outline" size={64} color="#9ca3af" />
+        <Text className="text-xl font-bold text-gray-800 my-4">
+          Toko Anda belum memiliki Produk
         </Text>
-        <Text
-          className="text-center text-gray-600 p-2 bg-gray-100 border-black border-dashed border rounded-md"
-          onPress={() => router.push("/dashboard/add-product")}
-        >
+        <Text className="text-lg text-center text-gray-600 mb-8">
           Tambahkan produk pertamamu untuk mulai berjualan!
         </Text>
-        {/* Reserved for adding new product button if no product is fetched */}
+        <Buttons
+          title="+ Produk Baru"
+          onPress={() => router.push("/dashboard/(user)/add-product")}
+        />
       </View>
     );
   }
@@ -121,21 +147,22 @@ const products = () => {
     return (
       <View className="p-4 m-2 bg-white rounded-lg shadow-sm border border-gray-100 flex-row justify-between items-center">
         <Image
-          className="mr-2 w-16 h-16 rounded"
+          className="mr-3 w-24 h-24 rounded-lg shadow-md border border-gray-100"
           source={{ uri: imageSrc }}
           resizeMode="cover"
         />
         <View className="flex-1 pr-4">
           <Text className="text-lg font-semibold">{item.name}</Text>
-          <Text className="text-sm text-gray-700">Harga: Rp. {item.price}</Text>
+          <Text className="text-sm text-gray-700">
+            Harga: Rp. {item.price.toLocaleString("id-ID")}
+          </Text>
           <Text className="text-sm text-gray-700">Stok: {item.stock}</Text>
         </View>
         <View className="flex-row gap-2">
           {/* Edit Button */}
           <Buttons
             title="Edit"
-            isLoading={false}
-            className="p-2 bg-blue-500 rounded-md"
+            className="p-1 bg-orange-600 rounded-md"
             textStyle="text-white text-xs font-semibold"
             onPress={() =>
               router.push(`/dashboard/(user)/edit-product/${item.id}`)
@@ -145,7 +172,7 @@ const products = () => {
           <Buttons
             title={isDeleting ? "..." : "Hapus"}
             isLoading={isDeleting}
-            className={`p-2 rounded-md ${isDeleting ? "bg-gray-400" : "bg-red-600"}`}
+            className={`p-1 rounded-md ${isDeleting ? "bg-gray-400" : "bg-red-600"}`}
             textStyle="text-white text-xs font-semibold"
             onPress={() => handleDelete(item)}
           />
@@ -160,16 +187,21 @@ const products = () => {
         data={products}
         keyExtractor={(item) => item.id}
         renderItem={renderProductItem}
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefreshing}
+            onRefresh={onRefresh}
+            tintColor="F97316"
+          />
+        }
         ListHeaderComponent={() => (
-          <View className="p-4 bg-orange-300 rounded-b-lg">
-            <Text className="text-2xl font-bold p-4 pb-2">
+          <View className="p-4 border-b bg-gray-100">
+            <Text className="text-2xl font-bold pb-4">
               Daftar Produk ({products.length})
             </Text>
             <Buttons
-              title="+ Tambah Produk Baru"
-              className="p-3 bg-green-600 rounded-lg shadow-sm"
-              textStyle="text-white text-center font-semibold"
-              onPress={() => router.push("/dashboard/add-product")}
+              title="+ Produk Baru"
+              onPress={() => router.push("/dashboard/(user)/add-product")}
             />
           </View>
         )}

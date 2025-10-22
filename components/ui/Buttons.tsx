@@ -25,7 +25,8 @@ const Buttons: React.FC<ButtonsProps> = ({
   disabled,
   ...rest
 }) => {
-  const finalClassName = `${className} ${isLoading || disabled ? "opacity-70" : "opacity-100"}`;
+  const defaultClassName = "bg-orange-600 p-3 rounded-lg";
+  const finalClassName = `${defaultClassName} ${className} ${isLoading || disabled ? "opacity-70" : "opacity-100"}`;
 
   return (
     <Pressable
