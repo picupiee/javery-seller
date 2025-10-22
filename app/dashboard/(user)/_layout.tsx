@@ -1,56 +1,27 @@
 import useUpdates from "@/hooks/useUpdate";
 import { Ionicons } from "@expo/vector-icons";
-import { Tabs } from "expo-router";
+import { Link, Tabs } from "expo-router";
 import { Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function RootLayout() {
-  const { updateStatus, error, checkForUpdates } = useUpdates();
-
-  const renderUpdateStatus = () => {
-    switch (updateStatus) {
-      case "checking":
-        return (
-          <SafeAreaView>
-            <Text className="text-xs text-blue-500 text-center bg-blue-500 py-1 mt-10">
-              Memerika Update Terbaru...
-            </Text>
-          </SafeAreaView>
-        );
-      case "downloading":
-        return (
-          <SafeAreaView>
-            <Text className="text-xs text-orange-500 text-center bg-orange-50 py-1 mt-10">
-              Mendownload Update...
-            </Text>
-          </SafeAreaView>
-        );
-      case "ready":
-        return (
-          <SafeAreaView>
-            <Text className="text-xs text-green-600 text-center bg-green-50 py-1 font-bold mt-10">
-              Update Tersedia !
-            </Text>
-          </SafeAreaView>
-        );
-      case "error":
-        return (
-          <SafeAreaView>
-            <Text
-              className="text-xs text-red-600 text-center bg-red-50 py-1"
-              onPress={checkForUpdates} // Calls the function to retry
-            >
-              Error pembaruan. Ketuk untuk coba lagi.
-            </Text>
-          </SafeAreaView>
-        );
-      default:
-        return <SafeAreaView />;
-    }
+  const { isUpdateAvailable } = useUpdates();
+  const renderUpdateBanner = () => {
+    if (!isUpdateAvailable) return null;
+    return (
+      <Link href="/dashboard/(user)/account" asChild>
+        <View className="bg-yellow-500 py-1 px-4 items-center">
+          <Text className="text-sm text-white font-semibold text-center">
+            Pembaruan Tersedia! Ketuk untuk menginstal.
+          </Text>
+        </View>
+      </Link>
+    );
   };
+
   return (
-    <View style={{ flex: 1 }}>
-      {renderUpdateStatus()}
+    <SafeAreaView style={{ flex: 1 }}>
+      {renderUpdateBanner()}
       <Tabs
         screenOptions={{
           headerShown: false,
@@ -121,6 +92,6 @@ export default function RootLayout() {
           }}
         />
       </Tabs>
-    </View>
+    </SafeAreaView>
   );
 }

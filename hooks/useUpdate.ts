@@ -1,77 +1,73 @@
-import { useState, useEffect } from 'react';
-import { Alert } from 'react-native';
+import { useEffect, useState } from "react";
+import { Alert } from "react-native";
 // ⚠️ Ensure this path correctly points to your expo-updates package
-import * as Updates from 'expo-updates'; 
+import * as Updates from "expo-updates";
 
 const useUpdates = () => {
-  const [updateStatus, setUpdateStatus] = useState<'checking' | 'available' | 'downloading' | 'ready' | 'error' | 'idle'>('idle');
+  // We only need a simple boolean to inform the UI
+  const [isUpdateAvailable, setIsUpdateAvailable] = useState(false);
+  // We keep updateStatus for the Account page to track the manual process
+  const [updateStatus, setUpdateStatus] = useState<
+    "checking" | "downloading" | "ready" | "error" | "idle"
+  >("idle");
   const [error, setError] = useState<string | null>(null);
 
-  const checkForUpdates = async () => {
-    // 1. Check if updates are enabled (crucial for development clients)
-    if (!Updates.isEnabled) {
-      console.log('Expo Updates is not enabled (running in Expo Go or development mode).');
-      return; 
-    }
-
+  // 1. Passive Check: Only checks, sets a boolean, and DOES NOT download or prompt
+  const passiveCheckForUpdates = async () => {
+    if (!Updates.isEnabled) return;
     try {
-      setUpdateStatus('checking');
-      setError(null); // Clear previous errors
-
-      // 2. Check the server for a new update
-      const updateCheckResult = await Updates.checkForUpdateAsync();
-
-      if (updateCheckResult.isAvailable) {
-        setUpdateStatus('downloading');
-        
-        // 3. Download the new bundle
-        const updateFetchResult = await Updates.fetchUpdateAsync(); 
-
-        if (updateFetchResult.isNew) {
-            setUpdateStatus('ready');
-            // 4. Prompt the user to apply the update immediately
-            Alert.alert(
-              "Pembaruan Tersedia",
-              "Versi baru aplikasi sudah siap. Muat ulang sekarang untuk menginstal?",
-              [
-                {
-                  text: "Muat Ulang Sekarang (Reload)",
-                  onPress: () => {
-                    // 5. Reload the app with the new bundle
-                    Updates.reloadAsync(); 
-                  },
-                },
-                {
-                  text: "Nanti",
-                  style: 'cancel',
-                  onPress: () => setUpdateStatus('idle'), 
-                },
-              ]
-            );
-        } else {
-            // This case handles a scenario where updateCheckResult.isAvailable was true, 
-            // but fetchUpdateAsync determines no new code was needed (e.g., already downloaded)
-            setUpdateStatus('idle'); 
-        }
-
-      } else {
-        setUpdateStatus('idle'); // No update available
-      }
-    } catch (e: any) {
-      console.error('Error fetching updates:', e);
-      setError("Gagal memeriksa pembaruan. Silakan periksa koneksi internet Anda.");
-      setUpdateStatus('error');
+      const update = await Updates.checkForUpdateAsync();
+      setIsUpdateAvailable(update.isAvailable); // Set the flag
+    } catch (e) {
+      // Log error but don't notify the user with a popup on the main screen
+      console.error("Passive update check failed:", e);
     }
   };
 
-  // Run the check once when the component mounts
+  // 2. Active Check: Used on the Account page (kept from before)
+  const activeCheckAndApplyUpdate = async () => {
+    if (!Updates.isEnabled) return;
+    setUpdateStatus("checking");
+    setError(null);
+
+    try {
+      const updateCheckResult = await Updates.checkForUpdateAsync();
+
+      if (updateCheckResult.isAvailable) {
+        setUpdateStatus("downloading");
+        await Updates.fetchUpdateAsync(); // Downloads the update
+
+        setUpdateStatus("ready");
+
+        // Prompt user ONLY after successful download
+        Alert.alert(
+          "Pembaruan Siap",
+          "Pembaruan telah diunduh. Muat ulang sekarang untuk menginstal?",
+          [
+            { text: "Muat Ulang", onPress: () => Updates.reloadAsync() },
+            { text: "Nanti", style: "cancel" },
+          ]
+        );
+      } else {
+        setUpdateStatus("idle");
+        // This case is handled in the Account screen's handler (e.g., show a toast)
+      }
+    } catch (e: any) {
+      setError("Gagal memeriksa/mengunduh pembaruan. Cek koneksi.");
+      setUpdateStatus("error");
+    }
+  };
+
   useEffect(() => {
-    checkForUpdates();
-    // No need for addListener as you provided: it is deprecated in the new API.
-    // We rely on the initial check and the user's interaction (or next cold start).
+    passiveCheckForUpdates(); // Run the passive check on mount
   }, []);
 
-  return { updateStatus, error, checkForUpdates };
+  return {
+    isUpdateAvailable,
+    updateStatus,
+    error,
+    activeCheckAndApplyUpdate, // Return the active function for the Account page
+  };
 };
 
 export default useUpdates;

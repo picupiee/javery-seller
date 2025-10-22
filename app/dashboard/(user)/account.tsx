@@ -10,23 +10,15 @@ const account = () => {
   const storeName = user?.profile?.storeName || "Nama Toko Belum Ditetapkan";
   const email = user?.email || "Email tidak ditemukan";
   const [loading, setLoading] = useState(false);
-  const { updateStatus, error, checkForUpdates } = useUpdates();
-  const [isChecking, setIsChecking] = useState(false);
+  const { updateStatus, error, activeCheckAndApplyUpdate } = useUpdates();
+
+  const isChecking =
+    updateStatus === "checking" || updateStatus === "downloading";
 
   const handleCheckUpdate = async () => {
-    setIsChecking(true);
-    try {
-      await checkForUpdates();
-      if (updateStatus === "idle") {
-        Alert.alert("Pembaruan", "Aplikasi Anda sudah versi terbaru.");
-      }
-    } catch (e) {
-      Alert.alert(
-        "Error",
-        "Gagal memeriksa pembaruan. Silakan coba lagi nanti."
-      );
-    } finally {
-      setIsChecking(false);
+    await activeCheckAndApplyUpdate();
+    if (updateStatus === "idle") {
+      Alert.alert("Status Pembaruan", "Aplikasi sudah versi terbaru.");
     }
   };
 
@@ -102,19 +94,19 @@ const account = () => {
       <Buttons
         title={
           isChecking
-            ? "Memeriksa..."
+            ? "Memeriksa & Mengunduh..."
             : updateStatus === "ready"
-              ? "Pembaruan Siap!"
+              ? "Pembaruan Siap (Ketuk!)"
               : "Cek Pembaruan Aplikasi"
         }
         onPress={handleCheckUpdate}
         isLoading={isChecking}
-        // Use the primary brand color (e.g., blue-500)
+        // Use color cues based on status
         className={`p-4 rounded-lg mt-4 ${updateStatus === "ready" ? "bg-green-600" : "bg-blue-500"}`}
         textStyle="text-white text-center font-semibold"
       />
       {updateStatus === "error" && (
-        <Text className="text-red-500 text-sm mt-2 text-center">
+        <Text className="text-red-500 text-sm mt-2">
           {error || "Gagal memeriksa. Coba lagi nanti."}
         </Text>
       )}
