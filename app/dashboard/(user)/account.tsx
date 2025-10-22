@@ -1,5 +1,6 @@
 import Buttons from "@/components/ui/Buttons";
 import { useAuth } from "@/context/AuthContext";
+import useUpdates from "@/hooks/useUpdate";
 
 import { router } from "expo-router";
 import React, { useState } from "react";
@@ -10,7 +11,41 @@ const account = () => {
   const storeName = user?.profile?.storeName || "Nama Toko Belum Ditetapkan";
   const email = user?.email || "Email tidak ditemukan";
   const [loading, setLoading] = useState(false);
-  
+  const { checkForUpdates, error, updateStatus } = useUpdates();
+
+  const handleUpdateApp = () => {
+    switch (updateStatus) {
+      case "checking":
+        return (
+          <Text className="text-xs text-blue-500 text-center bg-blue-500 py-1 mt-10">
+            Memerika Update Terbaru...
+          </Text>
+        );
+      case "downloading":
+        return (
+          <Text className="text-xs text-orange-500 text-center bg-orange-50 py-1 mt-10">
+            Mendownload Update...
+          </Text>
+        );
+      case "ready":
+        return (
+          <Text className="text-xs text-green-600 text-center bg-green-50 py-1 font-bold mt-10">
+            Update Tersedia !
+          </Text>
+        );
+      case "error":
+        return (
+          <Text
+            className="text-xs text-red-600 text-center bg-red-50 py-1"
+            onPress={checkForUpdates} // Calls the function to retry
+          >
+            Error pembaruan. Ketuk untuk coba lagi.
+          </Text>
+        );
+      default:
+        return null;
+    }
+  };
 
   const handleLogout = async () => {
     if (Platform.OS === "web") {
@@ -81,6 +116,15 @@ const account = () => {
         textStyle="text-white text-center font-bold text-lg"
         onPress={handleLogout}
       />
+      <Buttons
+        title="Cek Pembaruan Aplikasi"
+        isLoading={loading}
+        onLoading="Proses Keluar..."
+        className="mt-8 p-3 bg-red-600 rounded-md shadow-md"
+        textStyle="text-white text-center font-bold text-lg"
+        onPress={handleUpdateApp}
+      />
+      {updateStatus && <View className="mt-2">{updateStatus}</View>}
     </View>
   );
 };

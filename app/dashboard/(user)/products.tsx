@@ -161,7 +161,7 @@ const products = () => {
         keyExtractor={(item) => item.id}
         renderItem={renderProductItem}
         ListHeaderComponent={() => (
-          <View className="p-4">
+          <View className="p-4 bg-orange-300 rounded-b-lg">
             <Text className="text-2xl font-bold p-4 pb-2">
               Daftar Produk ({products.length})
             </Text>
