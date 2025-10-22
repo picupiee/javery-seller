@@ -9,7 +9,7 @@ import {
   updateDoc,
   where,
 } from "firebase/firestore";
-import { db } from "./firebase";
+import { db } from "../lib/firebase";
 
 export type OrderStatus =
   | "pending"
@@ -36,7 +36,8 @@ export interface Order {
 
 export const subscribeToSellerOrders = (
   sellerUid: string,
-  callback: (orders: Order[]) => void
+  callback: (orders: Order[]) => void,
+  onError: (error: Error) => void
 ) => {
   const ordersRef = collection(db, "orders");
   const q = query(
@@ -45,17 +46,23 @@ export const subscribeToSellerOrders = (
     orderBy("orderDate", "desc")
   );
 
-  const unsubscribe = onSnapshot(q, (querySnapshot) => {
-    const orders: Order[] = [];
+  const unsubscribe = onSnapshot(
+    q,
+    (querySnapshot) => {
+      const orders: Order[] = [];
 
-    querySnapshot.forEach((doc) => {
-      orders.push({
-        id: doc.id,
-        ...doc.data(),
-      } as Order);
-    });
-    callback(orders);
-  });
+      querySnapshot.forEach((doc) => {
+        orders.push({
+          id: doc.id,
+          ...doc.data(),
+        } as Order);
+      });
+      callback(orders);
+    },
+    (error) => {
+      onError(error as Error);
+    }
+  );
   return unsubscribe;
 };
 

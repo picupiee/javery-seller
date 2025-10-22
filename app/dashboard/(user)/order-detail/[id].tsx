@@ -1,5 +1,5 @@
 import Buttons from "@/components/ui/Buttons";
-import { Order, OrderStatus, getOrderById } from "@/lib/orderService";
+import { Order, OrderStatus, getOrderById } from "@/utils/orderService";
 import { Picker } from "@react-native-picker/picker";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";

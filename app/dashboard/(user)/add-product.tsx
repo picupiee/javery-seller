@@ -1,11 +1,19 @@
 import Buttons from "@/components/ui/Buttons";
 import { useAuth } from "@/context/AuthContext";
-import { createProduct } from "@/lib/productService";
 import { uploadImageToCloudinary } from "@/utils/cloudinary";
 import { selectAndManipulateImage } from "@/utils/imagePicker";
+import { createProduct } from "@/utils/productService";
 import { router } from "expo-router";
-import React, { useState } from "react";
-import { Alert, Image, ScrollView, Text, TextInput, View } from "react-native";
+import React, { useRef, useState } from "react";
+import {
+  Alert,
+  Image,
+  Keyboard,
+  ScrollView,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 
 const AddProductScreen = () => {
   const { user } = useAuth();
@@ -73,7 +81,11 @@ const AddProductScreen = () => {
         stock: parseInt(stock),
         imageUrl: imageUrl,
       };
-
+      if (!imageUrl) {
+        setError("Harus menyertakan Gambar Produk !");
+        return;
+      }
+      Keyboard.dismiss();
       await createProduct(newProduct);
       Alert.alert("Berhasil", "Produk sukses ditambahkan.");
       resetForm();
@@ -90,6 +102,8 @@ const AddProductScreen = () => {
     router.replace("/dashboard/products");
     resetForm();
   };
+  const priceRef = useRef<TextInput>(null);
+  const stockRef = useRef<TextInput>(null);
 
   return (
     <ScrollView
@@ -109,6 +123,8 @@ const AddProductScreen = () => {
           onChangeText={setName}
           autoCapitalize="words"
           className="p-3 border border-gray-300 rounded-lg placeholder:text-gray-400 focus:border-orange-500"
+          returnKeyType="next"
+          onSubmitEditing={() => priceRef.current?.focus()}
         />
       </View>
 
@@ -117,11 +133,14 @@ const AddProductScreen = () => {
           Harga (Rp)
         </Text>
         <TextInput
+          ref={priceRef}
           placeholder="Contoh: 25000"
           value={price}
           onChangeText={setPrice}
           keyboardType="decimal-pad"
           className="p-3 border border-gray-300 rounded-lg placeholder:text-gray-400 focus:border-orange-500"
+          returnKeyType="next"
+          onSubmitEditing={() => stockRef.current?.focus()}
         />
       </View>
 
@@ -130,11 +149,14 @@ const AddProductScreen = () => {
           Stok Produk
         </Text>
         <TextInput
+          ref={stockRef}
           placeholder="Contoh: 100"
           value={stock}
           onChangeText={setStock}
           keyboardType="decimal-pad"
           className="p-3 border border-gray-300 rounded-lg placeholder:text-gray-400 focus:border-orange-500"
+          returnKeyType="done"
+          onSubmitEditing={handleAddProduct}
         />
       </View>
       <View className="mb-6 border-t-2 border-b-2 pb-4 border-gray-400">

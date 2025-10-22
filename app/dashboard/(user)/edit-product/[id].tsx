@@ -1,11 +1,12 @@
 import Buttons from "@/components/ui/Buttons";
-import { getProductById, Product, updateProduct } from "@/lib/productService";
+import { getProductById, Product, updateProduct } from "@/utils/productService";
 import { router, useLocalSearchParams } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
   Image,
+  Keyboard,
   ScrollView,
   Text,
   TextInput,
@@ -110,7 +111,7 @@ const EditProduct = () => {
         imageUrl: productImage || "",
       };
       await updateProduct(id, updates);
-
+      Keyboard.dismiss()
       Alert.alert("Sukses", "Produk berhasil diperbarui");
       router.replace("/dashboard/products");
     } catch (err: any) {
@@ -171,6 +172,9 @@ const EditProduct = () => {
     router.replace("/dashboard/(user)/products");
   };
 
+  const priceRef = useRef<TextInput>(null);
+  const stockRef = useRef<TextInput>(null);
+
   return (
     <ScrollView
       contentContainerStyle={{ flexGrow: 1 }}
@@ -204,6 +208,8 @@ const EditProduct = () => {
           onChangeText={setName}
           autoCapitalize="words"
           className="p-3 border border-gray-300 rounded-lg focus:border-orange-500"
+          returnKeyType="next"
+          onSubmitEditing={() => priceRef.current?.focus()}
         />
       </View>
 
@@ -212,11 +218,14 @@ const EditProduct = () => {
           Harga (Rp)
         </Text>
         <TextInput
+          ref={priceRef}
           placeholder="Contoh: 25000"
           value={price}
           onChangeText={setPrice}
           keyboardType="decimal-pad"
           className="p-3 border border-gray-300 rounded-lg focus:border-orange-500"
+          returnKeyType="next"
+          onSubmitEditing={() => stockRef.current?.focus()}
         />
       </View>
 
@@ -225,11 +234,14 @@ const EditProduct = () => {
           Stok Produk
         </Text>
         <TextInput
+          ref={stockRef}
           placeholder="Contoh: 100"
           value={stock}
           onChangeText={setStock}
           keyboardType="decimal-pad"
           className="p-3 border border-gray-300 rounded-lg focus:border-orange-500"
+          returnKeyType="done"
+          onSubmitEditing={handleUpdateProduct}
         />
       </View>
 

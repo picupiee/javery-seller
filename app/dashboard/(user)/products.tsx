@@ -4,7 +4,7 @@ import {
   deleteProduct,
   Product,
   subscribeToSellerProducts,
-} from "@/lib/productService";
+} from "@/utils/productService";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
@@ -13,20 +13,10 @@ import {
   Alert,
   FlatList,
   Image,
-  LayoutAnimation,
-  Platform,
   RefreshControl,
   Text,
-  UIManager,
   View,
 } from "react-native";
-
-if (
-  Platform.OS === "android" &&
-  UIManager.setLayoutAnimationEnabledExperimental
-) {
-  UIManager.setLayoutAnimationEnabledExperimental(true);
-}
 
 const products = () => {
   const { user } = useAuth();
@@ -64,7 +54,7 @@ const products = () => {
 
   const executeDelete = async (productId: string) => {
     setDeletingId(productId);
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+
     try {
       await deleteProduct(productId);
       Alert.alert("Sukses", "Produk telah dihapus dari tokomu.");
@@ -134,6 +124,7 @@ const products = () => {
         </Text>
         <Buttons
           title="+ Produk Baru"
+          textStyle="text-center text-bold text-white"
           onPress={() => router.push("/dashboard/(user)/add-product")}
         />
       </View>
@@ -144,8 +135,11 @@ const products = () => {
   const renderProductItem = ({ item }: { item: Product }) => {
     const isDeleting = deletingId === item.id;
     const imageSrc = item.imageUrl;
+
     return (
-      <View className="p-4 m-2 bg-white rounded-lg shadow-sm border border-gray-100 flex-row justify-between items-center">
+      <View
+        className={`p-4 m-2 bg-white rounded-lg shadow-sm border border-gray-100 flex-row justify-between items-center ${isDeleting ? "opacity-50 border-red-500" : ""}`}
+      >
         <Image
           className="mr-3 w-24 h-24 rounded-lg shadow-md border border-gray-100"
           source={{ uri: imageSrc }}
@@ -158,6 +152,11 @@ const products = () => {
           </Text>
           <Text className="text-sm text-gray-700">Stok: {item.stock}</Text>
         </View>
+        {isDeleting && (
+          <View className="absolute inset-0 z-10 items-center justify-center bg-white/50">
+            <Text className="text-lg font-bold text-red-600">Menghapus...</Text>
+          </View>
+        )}
         <View className="flex-row gap-2">
           {/* Edit Button */}
           <Buttons
@@ -191,7 +190,7 @@ const products = () => {
           <RefreshControl
             refreshing={isRefreshing}
             onRefresh={onRefresh}
-            tintColor="F97316"
+            tintColor="#f97316"
           />
         }
         ListHeaderComponent={() => (
@@ -201,6 +200,7 @@ const products = () => {
             </Text>
             <Buttons
               title="+ Produk Baru"
+              textStyle="text-center text-bold text-white"
               onPress={() => router.push("/dashboard/(user)/add-product")}
             />
           </View>

@@ -1,10 +1,7 @@
 import Buttons from "@/components/ui/Buttons";
 import { useAuth } from "@/context/AuthContext";
-import {
-  Order,
-  OrderStatus,
-  subscribeToSellerOrders,
-} from "@/lib/orderService";
+import { Order, subscribeToSellerOrders } from "@/utils/orderService";
+import { getStatusStyle } from "@/utils/statusUtils";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
@@ -16,28 +13,6 @@ import {
   Text,
   View,
 } from "react-native";
-
-const getStatusColor = (status: OrderStatus) => {
-  const base = "font-bold py-1 px-2 rounded-full text-xs";
-  switch (status) {
-    case "pending":
-      return { text: "text-red-700", bg: "bg-red-100", label: "MENUNGGU" };
-    case "processing":
-      return {
-        text: "text-yellow-700",
-        bg: "bg-yellow-100",
-        label: "DIPROSES",
-      };
-    case "shipped":
-      return { text: "text-blue-700", bg: "bg-blue-100", label: "DIKIRIM" };
-    case "delivered":
-      return { text: "text-green-700", bg: "bg-green-100", label: "SELESAI" };
-    case "cancelled":
-      return { text: "text-red-700", bg: "bg-red-100", label: "DIBATALKAN" };
-    default:
-      return { text: "text-gray-700", bg: "bg-gray-100", label: "N/A" };
-  }
-};
 
 const orderList = () => {
   const { user } = useAuth();
@@ -59,20 +34,25 @@ const orderList = () => {
       setLoading(false);
       return;
     }
-    if (refreshTrigger > 0) {
-    } else {
+    if (refreshTrigger === 0) {
       setLoading(true);
     }
     setError(null);
 
-    setLoading(true);
-    setError(null);
-
-    const unsubscribe = subscribeToSellerOrders(user.uid, (newOrders) => {
-      setOrders(newOrders);
-      setLoading(false);
-      setIsRefreshing(false);
-    });
+    const unsubscribe = subscribeToSellerOrders(
+      user.uid,
+      (newOrders) => {
+        setOrders(newOrders);
+        setLoading(false);
+        setIsRefreshing(false);
+      },
+      (err) => {
+        console.error("Order Subscription Failed :", err);
+        setError(err.message || "Gagal memuat pesanan. Silakan coba lagi.");
+        setLoading(false);
+        setIsRefreshing(false);
+      }
+    );
     return () => unsubscribe();
   }, [user, refreshTrigger]);
 
@@ -120,7 +100,7 @@ const orderList = () => {
 
   // Helper for single item
   const renderOrderItem = ({ item }: { item: Order }) => {
-    const statusStyle = getStatusColor(item.status);
+    const statusStyle = getStatusStyle(item.status);
     return (
       <Pressable
         className="p-4 mx-3 my-2 bg-white rounded-lg shadow-md border border-gray-100"
@@ -137,7 +117,7 @@ const orderList = () => {
           Total : Rp{item.totalAmount.toLocaleString("id-ID")}
         </Text>
         <Text
-          className={`mt-2 font-extrabold text-sm ${getStatusColor(item.status)}`}
+          className={`mt-2 font-extrabold text-sm ${getStatusStyle(item.status)}`}
         >
           Status: {statusStyle.label}
         </Text>

@@ -1,3 +1,4 @@
+import { db } from "@/lib/firebase";
 import {
   addDoc,
   collection,
@@ -14,7 +15,6 @@ import {
   updateDoc,
   where,
 } from "firebase/firestore";
-import { db } from "./firebase";
 
 export interface Product {
   id: string;

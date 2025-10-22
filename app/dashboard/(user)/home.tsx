@@ -1,6 +1,9 @@
 import { useAuth } from "@/context/AuthContext";
-import { calculateTotalRevenue, countOrderByStatus } from "@/lib/orderService";
-import { countTotalProducts } from "@/lib/productService";
+import {
+  calculateTotalRevenue,
+  countOrderByStatus,
+} from "@/utils/orderService";
+import { countTotalProducts } from "@/utils/productService";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import {
@@ -33,6 +36,13 @@ const home = () => {
   const storeName = user?.profile?.storeName || "Toko Anda";
 
   const [greeting, setGreeting] = useState("");
+
+  const STATUS_COLORS_MAP = {
+    pending: "bg-red-600",
+    processing: "bg-yellow-600",
+    revenue: "bg-green-600",
+    products: "bg-orange-600",
+  };
 
   useEffect(() => {
     const updateGreeting = () => {
@@ -101,29 +111,36 @@ const home = () => {
   const renderMetricCard = (
     title: string,
     value: number | null,
-    colorClass: string,
+    colorKey: string,
     navPath?: string
-  ) => (
-    <Pressable
-      onPress={() => navPath && router.push(navPath as any)}
-      className={`w-full p-4 mb-4 rounded-lg shadow-md ${colorClass}`}
-      disabled={!navPath}
-    >
-      <Text className="text-white text-sm opacity-80">{title}</Text>
-      <Text className="text-white text-3xl font-bold mt-1">
-        {value === null
-          ? "--"
-          : title.includes("Revenue")
-            ? `Rp ${value.toLocaleString("id-ID")}`
-            : value}
-      </Text>
-      {navPath && (
-        <Text className="text-white text-xs mt-2 underline opacity-70">
-          Lihat Detail
+  ) => {
+    const colorClass =
+      STATUS_COLORS_MAP[colorKey as keyof typeof STATUS_COLORS_MAP] || colorKey;
+    // const isOrderStatus = colorKey === "pending" || colorKey === "processing";
+    const textColor = "text-white";
+
+    return (
+      <Pressable
+        onPress={() => navPath && router.push(navPath as any)}
+        className={`w-full p-4 mb-4 rounded-lg shadow-md ${colorClass}`}
+        disabled={!navPath}
+      >
+        <Text className={`${textColor} text-sm opacity-80`}>{title}</Text>
+        <Text className={`${textColor} text-3xl font-bold mt-1`}>
+          {value === null
+            ? "--"
+            : title.includes("Pendapatan")
+              ? `Rp ${value.toLocaleString("id-ID")}`
+              : value}
         </Text>
-      )}
-    </Pressable>
-  );
+        {navPath && (
+          <Text className={`${textColor} text-xs mt-2 underline opacity-70`}>
+            Lihat Detail
+          </Text>
+        )}
+      </Pressable>
+    );
+  };
 
   return (
     <ScrollView
@@ -141,18 +158,18 @@ const home = () => {
         {renderMetricCard(
           "Total Pendapatan (Terkirim)",
           metrics.totalRevenue,
-          "bg-green-600"
+          "revenue"
         )}
         {renderMetricCard(
           "Pesanan Diproses",
           metrics.processingOrders,
-          "bg-yellow-600",
+          "processing",
           "/dashboard/(user)/order-list"
         )}
         {renderMetricCard(
           "Menunggu Pembayaran",
           metrics.pendingOrders,
-          "bg-red-600",
+          "pending",
           "/dashboard/(user)/order-list"
         )}
       </View>
@@ -162,7 +179,7 @@ const home = () => {
         {renderMetricCard(
           "Total Produk",
           metrics.totalProducts,
-          "bg-blue-600",
+          "products",
           "/dashboard/(user)/products"
         )}
       </View>
