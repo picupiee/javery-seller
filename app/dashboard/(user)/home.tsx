@@ -23,6 +23,13 @@ interface Metrics {
   totalRevenue: number | null;
 }
 
+const STATUS_COLORS_MAP = {
+  pending: "bg-red-600",
+  processing: "bg-yellow-600",
+  revenue: "bg-green-600",
+  products: "bg-orange-600",
+};
+
 const home = () => {
   const { user } = useAuth();
   const [metrics, setMetrics] = useState<Metrics>({
@@ -36,13 +43,6 @@ const home = () => {
   const storeName = user?.profile?.storeName || "Toko Anda";
 
   const [greeting, setGreeting] = useState("");
-
-  const STATUS_COLORS_MAP = {
-    pending: "bg-red-600",
-    processing: "bg-yellow-600",
-    revenue: "bg-green-600",
-    products: "bg-orange-600",
-  };
 
   useEffect(() => {
     const updateGreeting = () => {

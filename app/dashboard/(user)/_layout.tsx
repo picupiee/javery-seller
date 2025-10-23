@@ -1,13 +1,16 @@
-import useUpdates from "@/hooks/useUpdate";
+import useUpdates, { isUpdateEnabledBuild } from "@/hooks/useUpdate";
 import { Ionicons } from "@expo/vector-icons";
 import { router, Tabs } from "expo-router";
 import { Pressable, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Toast from "react-native-toast-message"
+import Toast from "react-native-toast-message";
 
 export default function RootLayout() {
   const { isUpdateAvailable } = useUpdates();
   const renderUpdateBanner = () => {
+    if (!isUpdateEnabledBuild()) {
+      return null;
+    }
     if (!isUpdateAvailable) return null;
     return (
       <Pressable onPress={() => router.push("/dashboard/(user)/account")}>

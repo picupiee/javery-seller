@@ -158,13 +158,8 @@ const products = () => {
         className={`p-4 m-2 bg-white rounded-lg shadow-sm border border-gray-100 flex-row justify-between items-center ${isDeleting ? "opacity-50 border-red-500" : ""}`}
       >
         {productVisual}
-        {/* <Image
-          className="mr-3 w-24 h-24 rounded-lg shadow-md border border-gray-100"
-          source={{ uri: imageSrc }}
-          resizeMode="cover"
-        /> */}
         <View className="flex-1 pr-4">
-          <Text className="text-lg font-semibold">{item.name}</Text>
+          <Text className="text-lg font-bold">{item.name}</Text>
           <Text className="text-sm text-gray-700">
             Harga: Rp. {item.price.toLocaleString("id-ID")}
           </Text>

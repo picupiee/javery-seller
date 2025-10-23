@@ -3,6 +3,15 @@ import { Alert } from "react-native";
 // ⚠️ Ensure this path correctly points to your expo-updates package
 import * as Updates from "expo-updates";
 
+/**
+ * Returns true if the app is running in a standalone/deployed environment
+ * that supports OTA updates (i.e., not local Expo Go/Development Client).
+ */
+export const isUpdateEnabledBuild = () => {
+  // The updateId is null in development/Expo Go, but a UUID in deployed builds.
+  return Updates.updateId !== null;
+};
+
 const useUpdates = () => {
   // We only need a simple boolean to inform the UI
   const [isUpdateAvailable, setIsUpdateAvailable] = useState(false);
@@ -14,6 +23,10 @@ const useUpdates = () => {
 
   // 1. Passive Check: Only checks, sets a boolean, and DOES NOT download or prompt
   const passiveCheckForUpdates = async () => {
+    if (!isUpdateEnabledBuild()) {
+      console.log("Updates skipped: Not a deployed build.");
+      return;
+    }
     if (!Updates.isEnabled) return;
     try {
       const update = await Updates.checkForUpdateAsync();

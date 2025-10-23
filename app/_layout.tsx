@@ -27,14 +27,21 @@ function AppLayout() {
   });
 
   useEffect(() => {
-    if (fontError) throw fontError;
-  }, [fontError]);
-
-  useEffect(() => {
     if (fontsLoaded && !isLoading) {
       SplashScreen.hideAsync;
     }
-  }, [fontsLoaded, isLoading]);
+    if (fontError) throw fontError;
+  }, [fontsLoaded, isLoading, fontError]);
+
+  const inAuthGroup = segments[0] === "(auth)";
+
+  useEffect(() => {
+    if (user && inAuthGroup) {
+      router.replace("/dashboard/home");
+    } else if (!user && !inAuthGroup) {
+      router.replace("/sign-in");
+    }
+  }, [user, inAuthGroup]);
 
   if (!fontsLoaded) {
     return null;
@@ -50,15 +57,6 @@ function AppLayout() {
       </View>
     );
   }
-  const inAuthGroup = segments[0] === "(auth)";
-
-  useEffect(() => {
-    if (user && inAuthGroup) {
-      router.replace("/dashboard/home");
-    } else if (!user && !inAuthGroup) {
-      router.replace("/sign-in");
-    }
-  }, [user, inAuthGroup]);
 
   return <Slot />;
 }
