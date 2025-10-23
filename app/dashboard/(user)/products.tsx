@@ -140,15 +140,29 @@ const products = () => {
     const isDeleting = deletingId === item.id;
     const imageSrc = item.imageUrl;
 
+    const productVisual = imageSrc ? (
+      <Image
+        className="mr-3 w-24 h-24 rounded-lg shadow-md border border-gray-100"
+        source={{ uri: imageSrc }}
+        resizeMode="cover"
+      />
+    ) : (
+      <View className="mr-3 w-24 h-24 rounded-lg shadow-md border border-gray-200 bg-gray-100 items-center justify-center">
+        <Ionicons name="cube-outline" size={40} color="#9ca3af" />
+        <Text className="text-xs text-gray-500 mt-1">No Image</Text>
+      </View>
+    );
+
     return (
       <View
         className={`p-4 m-2 bg-white rounded-lg shadow-sm border border-gray-100 flex-row justify-between items-center ${isDeleting ? "opacity-50 border-red-500" : ""}`}
       >
-        <Image
+        {productVisual}
+        {/* <Image
           className="mr-3 w-24 h-24 rounded-lg shadow-md border border-gray-100"
           source={{ uri: imageSrc }}
           resizeMode="cover"
-        />
+        /> */}
         <View className="flex-1 pr-4">
           <Text className="text-lg font-semibold">{item.name}</Text>
           <Text className="text-sm text-gray-700">

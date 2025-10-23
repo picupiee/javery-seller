@@ -1,4 +1,5 @@
 import "@/global.css";
+import { useFonts } from "expo-font";
 import { router, Slot, SplashScreen, useSegments } from "expo-router";
 import { useEffect } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
@@ -17,14 +18,29 @@ export default function RootLayout() {
 function AppLayout() {
   const { user, isLoading } = useAuth();
   const segments = useSegments();
+  const [fontsLoaded, fontError] = useFonts({
+    // Mapping font
+    "Inter-Regular": require("@/assets/fonts/inter-regular.ttf"),
+    "Inter-Medium": require("@/assets/fonts/inter-medium.ttf"),
+    "Inter-SemiBold": require("@/assets/fonts/inter-semibold.ttf"),
+    "Inter-Bold": require("@/assets/fonts/inter-bold.ttf"),
+  });
 
   useEffect(() => {
-    if (!isLoading) {
-      SplashScreen.hideAsync();
-    }
-  }, [isLoading]);
+    if (fontError) throw fontError;
+  }, [fontError]);
 
-  if (isLoading) {
+  useEffect(() => {
+    if (fontsLoaded && !isLoading) {
+      SplashScreen.hideAsync;
+    }
+  }, [fontsLoaded, isLoading]);
+
+  if (!fontsLoaded) {
+    return null;
+  }
+
+  if (isLoading && !fontsLoaded) {
     return (
       <View className="flex-1 items-center justify-center">
         <View className="flex-row gap-2">

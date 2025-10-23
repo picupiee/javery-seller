@@ -4,7 +4,14 @@ module.exports = {
   content: ["./app/**/*.{js,jsx,ts,tsx}", "./components/**/*.{js,jsx,ts,tsx}"],
   presets: [require("nativewind/preset")],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        sans: ["Inter-Regular", "sans-serif"],
+        medium: ["Inter-Medium", "sans-serif"],
+        semibold: ["Inter-Semibold", "sans-serif"],
+        bold: ["Inter-Bold", "sans-serif"],
+      },
+    },
   },
   plugins: [],
-}
+};
