@@ -1,10 +1,11 @@
 import { useAuth } from "@/context/AuthContext";
+import { toggleStorePing } from "@/lib/storeService";
 import {
   calculateTotalRevenue,
   countOrderByStatus,
 } from "@/utils/orderService";
 import { countTotalProducts } from "@/utils/productService";
-import { showErrorToast } from "@/utils/toastUtils";
+import { showErrorToast, showSuccessToast } from "@/utils/toastUtils";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import {
@@ -12,7 +13,9 @@ import {
   Pressable,
   RefreshControl,
   ScrollView,
+  Switch,
   Text,
+  TextInput,
   View,
 } from "react-native";
 
@@ -41,8 +44,31 @@ const home = () => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const storeName = user?.profile?.storeName || "Toko Anda";
-
   const [greeting, setGreeting] = useState("");
+
+  const [isPinging, setIsPinging] = useState(false);
+  const [pingMessage, setPingMessage] = useState(
+    "Buka dan Siap Melayani Pesanan !"
+  );
+
+  const handleTogglePing = async (newValue: boolean) => {
+    if (!user) return;
+    setIsPinging(newValue);
+
+    try {
+      await toggleStorePing(user.uid, newValue, pingMessage);
+      showSuccessToast(
+        newValue ? "Ping Diaktifkan" : "Ping Dinonaktifkan",
+        newValue
+          ? "Pembeli akan melihat promosi anda."
+          : "Status toko anda tutup."
+      );
+    } catch (error) {
+      setIsPinging(!newValue);
+      showErrorToast("Gagal mengubah status ping");
+      console.error("Ping error:", error);
+    }
+  };
 
   useEffect(() => {
     const updateGreeting = () => {
@@ -183,6 +209,36 @@ const home = () => {
           "/dashboard/(user)/products"
         )}
       </View>
+      {/* Ping Toggle */}
+      <View className="mt-6 p-4 bg-white rounded-lg shadow-md border-t-2 border-orange-500">
+        <Text className="text-lg font-semibold mb-2">Status Promosi Toko</Text>
+        <View className="flex-row items-center justify-between mb-3">
+          <Text className="text-md text-gray-700">Aktifkan Ping</Text>
+          <Switch
+            value={isPinging}
+            onValueChange={handleTogglePing}
+            trackColor={{ false: "#ccc", true: "#f97316" }}
+          />
+        </View>
+        {isPinging && (
+          <View className="mt-2">
+            <Text className="text-sm text-gray-600 mb-1">
+              Pesan Promosi Singkat:
+            </Text>
+            <TextInput
+              value={pingMessage}
+              onChangeText={setPingMessage}
+              placeholder="Contoh: Silahkan order kue kami!"
+              maxLength={80}
+              className="border border-gray-800 p-2 rounded-lg"
+            />
+            <Text className="text-xs text-gray-500 mt-1 self-end">
+              {pingMessage.length}/80
+            </Text>
+          </View>
+        )}
+      </View>
+      {/* Javery mini Blog (Coming Soon) */}
       <View className="mt-3 border-t-4 border-gray-300 pt-2">
         <Text className="text-3xl font-semibold">Berita Javery</Text>
         <Text className="mt-10 text-xl font-semibold text-gray-400 text-center">
