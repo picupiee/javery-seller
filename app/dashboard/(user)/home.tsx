@@ -1,4 +1,5 @@
 import { useAuth } from "@/context/AuthContext";
+import useDebounce from "@/hooks/useDebounce";
 import { toggleStorePing } from "@/lib/storeService";
 import {
   calculateTotalRevenue,
@@ -10,6 +11,8 @@ import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
   Pressable,
   RefreshControl,
   ScrollView,
@@ -50,9 +53,27 @@ const home = () => {
   const [pingMessage, setPingMessage] = useState(
     "Buka dan Siap Melayani Pesanan !"
   );
+  const debouncedPingMessage = useDebounce(pingMessage, 500);
+
+  useEffect(() => {
+    if (!user || !isPinging) {
+      return;
+    }
+    console.log(`Firestore Update Triggered: ${debouncedPingMessage}`);
+
+    const syncMessage = async () => {
+      try {
+        await toggleStorePing(user.uid, true, debouncedPingMessage);
+      } catch (error) {
+        console.error("Failed to sync debounced message: ", error);
+      }
+    };
+    syncMessage();
+  }, [debouncedPingMessage, user, isPinging]);
 
   const handleTogglePing = async (newValue: boolean) => {
     if (!user) return;
+
     setIsPinging(newValue);
 
     try {
@@ -169,84 +190,94 @@ const home = () => {
   };
 
   return (
-    <ScrollView
-      className="flex-1 p-4 bg-white"
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
-      }
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 40}
     >
-      <Text className="text-3xl font-bold mb-6 text-gray-800">{greeting}</Text>
-      {/* Sales / Orders Metrics */}
-      <View className="mb-6">
-        <Text className="text-md font-semibold mb-3 border-b-2 pb-1">
-          Kinerja Penjualan
+      <ScrollView
+        className="flex-1 p-4 bg-white"
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+        }
+      >
+        <Text className="text-3xl font-bold mb-6 text-gray-800">
+          {greeting}
         </Text>
-        {renderMetricCard(
-          "Total Pendapatan (Terkirim)",
-          metrics.totalRevenue,
-          "revenue"
-        )}
-        {renderMetricCard(
-          "Pesanan Diproses",
-          metrics.processingOrders,
-          "processing",
-          "/dashboard/(user)/order-list"
-        )}
-        {renderMetricCard(
-          "Menunggu Pembayaran",
-          metrics.pendingOrders,
-          "pending",
-          "/dashboard/(user)/order-list"
-        )}
-      </View>
-      {/* Inventory Metrics */}
-      <View>
-        <Text className="text-md mb-2">Kelola Produk</Text>
-        {renderMetricCard(
-          "Total Produk",
-          metrics.totalProducts,
-          "products",
-          "/dashboard/(user)/products"
-        )}
-      </View>
-      {/* Ping Toggle */}
-      <View className="mt-6 p-4 bg-white rounded-lg shadow-md border-t-2 border-orange-500">
-        <Text className="text-lg font-semibold mb-2">Status Promosi Toko</Text>
-        <View className="flex-row items-center justify-between mb-3">
-          <Text className="text-md text-gray-700">Aktifkan Ping</Text>
-          <Switch
-            value={isPinging}
-            onValueChange={handleTogglePing}
-            trackColor={{ false: "#ccc", true: "#f97316" }}
-          />
+        {/* Sales / Orders Metrics */}
+        <View className="mb-6">
+          <Text className="text-md font-semibold mb-3 border-b-2 pb-1">
+            Kinerja Penjualan
+          </Text>
+          {renderMetricCard(
+            "Total Pendapatan (Terkirim)",
+            metrics.totalRevenue,
+            "revenue"
+          )}
+          {renderMetricCard(
+            "Pesanan Diproses",
+            metrics.processingOrders,
+            "processing",
+            "/dashboard/(user)/order-list"
+          )}
+          {renderMetricCard(
+            "Menunggu Pembayaran",
+            metrics.pendingOrders,
+            "pending",
+            "/dashboard/(user)/order-list"
+          )}
         </View>
-        {isPinging && (
-          <View className="mt-2">
-            <Text className="text-sm text-gray-600 mb-1">
-              Pesan Promosi Singkat:
-            </Text>
-            <TextInput
-              value={pingMessage}
-              onChangeText={setPingMessage}
-              placeholder="Contoh: Silahkan order kue kami!"
-              maxLength={80}
-              className="border border-gray-800 p-2 rounded-lg"
+        {/* Inventory Metrics */}
+        <View>
+          <Text className="text-md mb-2">Kelola Produk</Text>
+          {renderMetricCard(
+            "Total Produk",
+            metrics.totalProducts,
+            "products",
+            "/dashboard/(user)/products"
+          )}
+        </View>
+        {/* Ping Toggle */}
+        <View className="mt-6 p-4 bg-white rounded-lg shadow-md border-t-2 border-orange-500">
+          <Text className="text-lg font-semibold mb-2">
+            Status Promosi Toko
+          </Text>
+          <View className="flex-row items-center justify-between mb-3">
+            <Text className="text-md text-gray-700">Aktifkan Ping</Text>
+            <Switch
+              value={isPinging}
+              onValueChange={handleTogglePing}
+              trackColor={{ false: "#ccc", true: "#f97316" }}
             />
-            <Text className="text-xs text-gray-500 mt-1 self-end">
-              {pingMessage.length}/80
-            </Text>
           </View>
-        )}
-      </View>
-      {/* Javery mini Blog (Coming Soon) */}
-      <View className="mt-3 border-t-4 border-gray-300 pt-2">
-        <Text className="text-3xl font-semibold">Berita Javery</Text>
-        <Text className="mt-10 text-xl font-semibold text-gray-400 text-center">
-          Segera Hadir
-        </Text>
-      </View>
-      <View className="h-20" />
-    </ScrollView>
+          {isPinging && (
+            <View className="mt-2">
+              <Text className="text-sm text-gray-600 mb-1">
+                Pesan Promosi Singkat:
+              </Text>
+              <TextInput
+                value={pingMessage}
+                onChangeText={setPingMessage}
+                placeholder="Contoh: Silahkan order kue kami!"
+                maxLength={80}
+                className="border border-gray-800 p-2 rounded-lg placeholder:text-gray-500"
+              />
+              <Text className="text-xs text-gray-500 mt-1 self-end">
+                {pingMessage.length}/80
+              </Text>
+            </View>
+          )}
+        </View>
+        {/* Javery mini Blog (Coming Soon) */}
+        <View className="mt-3 border-t-4 border-gray-300 pt-2">
+          <Text className="text-3xl font-semibold">Berita Javery</Text>
+          <Text className="mt-10 text-xl font-semibold text-gray-400 text-center">
+            Segera Hadir
+          </Text>
+        </View>
+        <View className="h-20" />
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 export default home;
